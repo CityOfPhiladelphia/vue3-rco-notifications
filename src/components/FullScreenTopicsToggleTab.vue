@@ -30,7 +30,6 @@ watch(
 // });
 
 const fullScreenTopicsEnabled = computed(() => {
-  // if (import.meta.env.VITE_DEBUG == 'true') console.log('this.$store.state.fullScreenTopicsEnabled:', this.$store.state.fullScreenTopicsEnabled);
   return MainStore.fullScreenTopicsEnabled;
 });
 

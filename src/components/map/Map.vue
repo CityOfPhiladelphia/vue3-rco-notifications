@@ -26,14 +26,8 @@ import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 const GeocodeStore = useGeocodeStore();
 import { useParcelsStore } from '@/stores/ParcelsStore.js'
 const ParcelsStore = useParcelsStore();
-import { useLiStore } from '@/stores/LiStore.js'
-const LiStore = useLiStore();
-import { useVotingStore } from '@/stores/VotingStore.js'
-const VotingStore = useVotingStore();
-import { useNearbyActivityStore } from '@/stores/NearbyActivityStore';
-const NearbyActivityStore = useNearbyActivityStore();
-import { useCity311Store } from '@/stores/City311Store';
-const City311Store = useCity311Store();
+// import { useCity311Store } from '@/stores/City311Store';
+// const City311Store = useCity311Store();
 
 // ROUTER
 import { useRouter, useRoute } from 'vue-router';
@@ -47,8 +41,6 @@ import ImageryToggleControl from '@/components/map/ImageryToggleControl.vue';
 import ImageryDropdownControl from '@/components/map/ImageryDropdownControl.vue';
 import CyclomediaControl from '@/components/map/CyclomediaControl.vue';
 import EagleviewControl from '@/components/map/EagleviewControl.vue';
-import OpacitySlider from '@/components/map/OpacitySlider.vue';
-import OverlayLegend from '@/components/map/OverlayLegend.vue';
 import EagleviewPanel from '@/components/map/EagleviewPanel.vue';
 import CyclomediaPanel from '@/components/map/CyclomediaPanel.vue';
 import CyclomediaRecordingsClient from '@/util/recordings-client.js';
@@ -67,15 +59,13 @@ const cameraSrc = computed(() => {
 })
 
 onMounted(async () => {
-  // if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue onMounted route.params.topic:', route.params.topic, 'route.params.address:', route.params.address);
-  
   // create the maplibre map
-  let currentTopicMapStyle = route.params.topic ? $config.topicStyles[route.params.topic] : 'pwdDrawnMapStyle';
+  let mapStyle = 'pwdDrawnMapStyle';
   let zoom = route.params.address ? 17 : 12;
 
   map = new maplibregl.Map({
     container: 'map',
-    style: $config[currentTopicMapStyle],
+    style: $config[mapStyle],
     center: $config.cityCenterCoords,
     // center: [-75.163471, 39.953338],
     zoom: zoom,
@@ -130,13 +120,6 @@ onMounted(async () => {
     }
   });
 
-  // if the L&I topic is selected, and a building footprint is clicked, set the selected building number in the LiStore
-  map.on('click', 'liBuildingFootprints', (e) => {
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('liBuildingFootprints click, e:', e);
-    e.clickOnLayer = true;
-    LiStore.selectedLiBuildingNumber = e.features[0].properties.id;
-  });
-
   map.on('mouseenter', 'liBuildingFootprints', (e) => {
     if (e.features.length > 0) {
       map.getCanvas().style.cursor = 'pointer'
@@ -162,55 +145,6 @@ onMounted(async () => {
 
   map.on('mouseleave', 'cyclomediaRecordings', () => {
     map.getCanvas().style.cursor = ''
-  });
-
-  // if a nearby circle marker is clicked or hovered on, set its id in the MainStore as the hoveredStateId
-  map.on('click', 'nearby', (e) => {
-    const properties = e.features[0].properties;
-    let idField, infoField, row;
-    if (MainStore.currentTopic == 'nearby') {
-      idField = NearbyActivityStore.dataFields[properties.type].id_field;
-      infoField = NearbyActivityStore.dataFields[properties.type].info_field;
-      row = NearbyActivityStore[properties.type].rows.filter(row => row[idField] === properties.id)[0];
-    } else if (MainStore.currentTopic == '311') {
-      idField = City311Store.dataFields[properties.type].id_field;
-      infoField = City311Store.dataFields[properties.type].info_field;
-      row = City311Store[properties.type].rows.filter(row => row[idField] === properties.id)[0];
-    }
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('nearby click, e:', e, 'properties:', properties, 'idField:', idField, 'infoField:', infoField, 'e.features[0]:', e.features[0], 'row:', row);
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('nearby click, e:', e, 'properties:', properties, 'idField:', idField, 'e.features[0]:', e.features[0], 'type:', type, 'row:', row);
-    e.clickOnLayer = true;
-    MainStore.clickedMarkerId = e.features[0].properties.id;
-    MainStore.hoveredStateId = e.features[0].properties.id;
-    if (row.properties) {
-      row[infoField] = row.properties[infoField];
-    }
-
-    const popup = document.getElementsByClassName('maplibregl-popup');
-    if (popup.length) {
-      popup[0].remove();
-    }
-    new maplibregl.Popup({ className: 'my-class' })
-      .setLngLat(e.lngLat)
-      .setHTML(row[infoField])
-      .setMaxWidth("300px")
-      .addTo(map);
-  });
-
-  map.on('mouseenter', 'nearby', (e) => {
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('mouseenter, e:', e);
-    if (e.features.length > 0) {
-      // if (import.meta.env.VITE_DEBUG == 'true') console.log('map.getSource(nearby):', map.getSource('nearby'), 'map.getStyle().sources:', map.getStyle().sources);
-      map.getCanvas().style.cursor = 'pointer'
-      MainStore.hoveredStateId = e.features[0].properties.id;
-    }
-  });
-
-  map.on('mouseleave', 'nearby', () => {
-    if (hoveredStateId.value) {
-      map.getCanvas().style.cursor = ''
-      MainStore.hoveredStateId = null;
-    }
   });
 
   // if the map is clicked (not on the layers above), if in draw mode, a polygon is drawn, otherwise, the lngLat is pushed to the app route
@@ -326,105 +260,6 @@ watch(
   }
 });
 
-watch(
-  () => MainStore.currentNearbyTimeInterval,
-  () => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('watch currentNearbyTimeIntervals is firing');
-    const popup = document.getElementsByClassName('maplibregl-popup');
-    if (popup.length) {
-      popup[0].remove();
-    }
-  }
-)
-
-// watch topic for changing map style
-watch(
-  () => route.params.topic,
-  async newTopic => {
-    MainStore.currentTopic = route.params.topic;
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('Map route.params.topic watch, newTopic:', newTopic);
-    const popup = document.getElementsByClassName('maplibregl-popup');
-    if (popup.length) {
-      popup[0].remove();
-    }
-    if (newTopic) {
-      map.setStyle($config[$config.topicStyles[newTopic]]);
-      if (MapStore.imageryOn) {
-        map.addLayer($config.mapLayers[imagerySelected.value], 'cyclomediaRecordings')
-        map.addLayer($config.mapLayers.imageryLabels, 'cyclomediaRecordings')
-        map.addLayer($config.mapLayers.imageryParcelOutlines, 'cyclomediaRecordings')
-      }
-      const addressMarker = map.getSource('addressMarker');
-      const dorParcel = map.getSource('dorParcel');
-      if (addressMarker && pwdCoordinates.value.length) {
-        if (import.meta.env.VITE_DEBUG == 'true') console.log('pwdCoordinates.value:', pwdCoordinates.value);
-        // if (import.meta.env.VITE_DEBUG == 'true') console.log('1 map.layers:', map.getStyle().layers, map.getStyle().sources);
-        addressMarker.setData(point(pwdCoordinates.value));
-      }
-      if (dorParcel) {
-        if ($config.parcelLayerForTopic[newTopic] == 'dor') {
-          let newParcel;
-          if (dorCoordinates.value.length > 3) {
-            newParcel = polygon([ dorCoordinates.value ]);
-            map.getSource('dorParcel').setData(newParcel);
-          } else {
-            newParcel = multiPolygon(dorCoordinates.value);
-            map.getSource('dorParcel').setData(newParcel);
-          }
-        }
-        if (import.meta.env.VITE_DEBUG == 'true') console.log('2 map.layers:', map.getStyle().layers, map.getStyle().sources);
-      }
-      if (newTopic === 'li') {
-        if (selectedLiBuildingNumber.value) {
-          map.setPaintProperty(
-            'liBuildingFootprints',
-            'fill-color',
-            ['match',
-            ['get', 'id'],
-            selectedLiBuildingNumber.value,
-            '#FFFA80',
-            /* other */ '#C2B7FF'
-            ],
-          )
-        }
-      }
-      MapStore.selectedRegmap = null;
-    } else {
-      if (!MapStore.imageryOn) {
-        map.setStyle($config.pwdDrawnMapStyle);
-      }
-      const addressMarker = map.getSource('addressMarker');
-      const dorParcel = map.getSource('dorParcel');
-      if (addressMarker) {
-        // if (import.meta.env.VITE_DEBUG == 'true') console.log('1 map.layers:', map.getStyle().layers, map.getStyle().sources);
-        if (pwdCoordinates.value.length) {
-          addressMarker.setData(point(pwdCoordinates.value));
-        }
-        if (import.meta.env.VITE_DEBUG == 'true') console.log('dorCoordinates.value:', dorCoordinates.value);
-      }
-      if (dorParcel) {
-        let newParcel;
-        if ($config.parcelLayerForTopic[newTopic] == 'dor') {
-          if (dorCoordinates.value.length > 3) {
-            newParcel = polygon([ dorCoordinates.value ]);
-            map.getSource('dorParcel').setData(newParcel);
-          } else {
-            newParcel = multiPolygon(dorCoordinates.value);
-            map.getSource('dorParcel').setData(newParcel);
-          }
-        }
-        if (import.meta.env.VITE_DEBUG == 'true') console.log('2 map.layers:', map.getStyle().layers, map.getStyle().sources);
-      }
-    }
-    if (MapStore.cyclomediaOn) {
-      updateCyclomediaCameraAngle();
-    }
-    if (MapStore.labelLayers.length && MapStore.labelLayers.length > 0) {
-      setLabelLayers(MapStore.labelLayers);
-    }
-  }
-)
-
 // allow the imagery to be toggled on and off, and set to different images
 const imagerySelected = computed(() => {
   return MapStore.imagerySelected;
@@ -442,13 +277,7 @@ const toggleImagery = () => {
     MapStore.imageryOn = false;
     map.removeLayer(imagerySelected.value);
     map.removeLayer('imageryLabels');
-    map.removeLayer('imageryParcelOutlines')
-    if (!route.params.topic) {
-      map.setStyle($config['pwdDrawnMapStyle']);
-      if (pwdCoordinates.value.length) {
-        map.getSource('addressMarker').setData(point(pwdCoordinates.value));
-      }
-    }
+    map.removeLayer('imageryParcelOutlines');
   }
 }
 
@@ -463,180 +292,6 @@ const setImagery = async (newImagery) => {
   map.removeLayer(oldLayer);
 }
 
-// for Deeds topic, watch selectedRegmap for adding and changing regmap layer
-const selectedRegmap = computed(() => { return MapStore.selectedRegmap; });
-watch(
-  () => selectedRegmap.value,
-  (newRegmap, oldRegmap) => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('addRegmapLayer, newRegmap:', newRegmap, 'oldRegmap:', oldRegmap);
-    if (newRegmap == null) {
-      // if (import.meta.env.VITE_DEBUG == 'true') console.log('remove old regmap');
-      if (map.getLayer('regmap')) {
-        map.removeLayer('regmap');
-        map.removeSource('regmap');
-      }
-      MapStore.selectedRegmap = null;
-    } else if (oldRegmap == null) {
-      if (map.getSource('regmap')) {
-        map.removeSource('regmap');
-      }
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('add newRegmap:', newRegmap);
-      const tiles =  `https://ags-regmaps.phila.gov/arcgis/rest/services/RegMaps/MapServer/export?dpi=96&layerDefs=0:NAME='g${newRegmap.toLowerCase().trim()}.tif'&transparent=true&format=png24&bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=700,700&f=image&layers=show%3A0`;
-      $config.dorDrawnMapStyle.sources.regmap = {
-        type: 'raster',
-        tiles: [tiles],
-        tileSize: 256,
-      }
-      map.addLayer({
-        id: 'regmap',
-        type: 'raster',
-        source: $config.dorDrawnMapStyle.sources.regmap,
-        paint: {
-          'raster-opacity': MapStore.regmapOpacity,
-        },
-      }, 'dorParcel');
-    } else {
-      map.removeLayer('regmap');
-      map.removeSource('regmap');
-      const tiles =  `https://ags-regmaps.phila.gov/arcgis/rest/services/RegMaps/MapServer/export?dpi=96&layerDefs=0:NAME='g${newRegmap.toLowerCase().trim()}.tif'&transparent=true&format=png24&bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=700,700&f=image&layers=show%3A0`;
-      $config.dorDrawnMapStyle.sources.regmap = {
-        type: 'raster',
-        tiles: [tiles],
-        tileSize: 256,
-      }
-      map.addLayer({
-        id: 'regmap',
-        type: 'raster',
-        source: $config.dorDrawnMapStyle.sources.regmap,
-        paint: {
-          'raster-opacity': MapStore.regmapOpacity,
-        },
-      }, 'dorParcel');
-    }
-  }
-);
-
-// Opacity changes
-// for Deeds topic, change opacity of regmap layer
-const handleRegmapOpacityChange = (opacity) => {
-  MapStore.regmapOpacity = opacity/100;
-  map.setPaintProperty(
-    'regmap',
-    'raster-opacity',
-    parseFloat(opacity/100),
-  );
-}
-
-// for Zoning topic, change opacity of zoning layer
-const handleZoningOpacityChange = (opacity) => {
-  MapStore.zoningOpacity = opacity/100;
-  map.setPaintProperty(
-    'zoning',
-    'raster-opacity',
-    opacity/100,
-  );
-}
-
-// for Cityatlas Stormwater topic, change opacity of stormwater layer
-const handleStormwaterOpacityChange = (opacity) => {
-  MapStore.stormwaterOpacity = opacity/100;
-  map.setPaintProperty(
-    'stormwater',
-    'raster-opacity',
-    opacity/100,
-  );
-}
-
-// for L&I topic, watch selected building for changing building footprint color
-const selectedLiBuildingNumber = computed(() => { return LiStore.selectedLiBuildingNumber; });
-watch(
-  () => selectedLiBuildingNumber.value,
-  newSelectedLiBuildingNumber => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue watch newSelectedLiBuildingNumber:', newSelectedLiBuildingNumber, 'selectedLiBuildingNumber.value:', selectedLiBuildingNumber.value);
-    if (newSelectedLiBuildingNumber == null) {
-      map.setPaintProperty(
-        'liBuildingFootprints',
-        'fill-color',
-        '#C2B7FF',
-      )
-      return;
-    }
-    map.setPaintProperty(
-      'liBuildingFootprints',
-      'fill-color',
-      ['match',
-      ['get', 'id'],
-      newSelectedLiBuildingNumber,
-      '#FFFA80',
-      /* other */ '#C2B7FF'
-      ],
-    )
-  }
-)
-
-// for Voting topic, watch voting division and polling place for changing map center and zoom
-const votingDivision = computed(() => { 
-  if (import.meta.env.VITE_VOTING_DATA_SOURCE == 'carto') {
-    if (VotingStore.divisions.rows) {
-      return JSON.parse(VotingStore.divisions.rows[0].st_asgeojson);
-    } else {
-      return [[0,0], [0,1], [1,1], [1,0], [0,0]];
-    }
-  } else if (import.meta.env.VITE_VOTING_DATA_SOURCE == 'arcgis') {
-    if (VotingStore.divisions.features) {
-      return VotingStore.divisions.features[0].geometry.coordinates[0];
-    } else {
-      return [[0,0], [0,1], [1,1], [1,0], [0,0]];
-    }
-  } else {
-    return [[0,0], [0,1], [1,1], [1,0], [0,0]];
-  }
-});
-const pollingPlaceCoordinates = computed(() => {
-  if (import.meta.env.VITE_VOTING_DATA_SOURCE == 'carto') {
-    if (VotingStore.pollingPlaces.rows) {
-      return [ VotingStore.pollingPlaces.rows[0].lng, VotingStore.pollingPlaces.rows[0].lat] ;
-    } else {
-      return [];
-    }
-  } else if (import.meta.env.VITE_VOTING_DATA_SOURCE == 'arcgis') {
-    if (VotingStore.pollingPlaces.features) {
-      return VotingStore.pollingPlaces.features[0].geometry.coordinates;
-    } else {
-      return [];
-    }
-  }
-});
-watchEffect(() => {
-  if (VotingStore.divisions.rows && VotingStore.pollingPlaces.rows) {
-    const newDivision = feature(votingDivision.value);
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('watchEffect 1, newDivision:', newDivision, 'votingDivision.value:', votingDivision.value, 'pollingPlaceCoordinates.value:', pollingPlaceCoordinates.value);
-    map.getSource('votingDivision').setData(newDivision);
-    $config.votingDrawnMapStyle.sources.votingDivision.data = newDivision;
-    const newPollingPlace = point(pollingPlaceCoordinates.value);
-    map.getSource('buildingColumnsMarker').setData(newPollingPlace);
-    $config.votingDrawnMapStyle.sources.buildingColumnsMarker.data = newPollingPlace;
-    const theFeatureCollection = featureCollection([newDivision, newPollingPlace]);
-    const bounds = bbox(buffer(theFeatureCollection, 400, {units: 'feet'}));
-    map.fitBounds(bounds);
-  }
-});
-
-watchEffect(() => {
-  if (VotingStore.divisions.features && VotingStore.pollingPlaces.features) {
-    const newDivision = polygon([votingDivision.value]);
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('watchEffect 2, newDivision:', newDivision, 'votingDivision.value:', votingDivision.value, 'pollingPlaceCoordinates.value:', pollingPlaceCoordinates.value);
-    map.getSource('votingDivision').setData(newDivision);
-    $config.votingDrawnMapStyle.sources.votingDivision.data = newDivision;
-    const newPollingPlace = point(pollingPlaceCoordinates.value);
-    map.getSource('buildingColumnsMarker').setData(newPollingPlace);
-    $config.votingDrawnMapStyle.sources.buildingColumnsMarker.data = newPollingPlace;
-    const theFeatureCollection = featureCollection([newDivision, newPollingPlace]);
-    const bounds = bbox(buffer(theFeatureCollection, 400, {units: 'feet'}));
-    map.fitBounds(bounds);
-  }
-});
-
 // for Nearby topic, watch the clicked row to fly to its coordinates and show a popup
 const clickedRow = computed(() => { return MainStore.clickedRow; })
 watch(
@@ -645,15 +300,11 @@ watch(
     if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue clickedRow watch, newClickedRow:', newClickedRow, 'newClickedRow.type:', newClickedRow.type);
     if (newClickedRow) map.flyTo({ center: newClickedRow.lngLat });
     let idField, infoField, row;
-    if (MainStore.currentTopic == 'nearby') {
-      idField = NearbyActivityStore.dataFields[newClickedRow.type].id_field;
-      infoField = NearbyActivityStore.dataFields[newClickedRow.type].info_field;
-      row = NearbyActivityStore[newClickedRow.type].rows.filter(row => row[idField] === newClickedRow.id)[0];
-    } else if (MainStore.currentTopic == 'city311') {
-      idField = City311Store.dataFields.city311.id_field;
-      infoField = City311Store.dataFields.city311.info_field;
-      row = City311Store[newClickedRow.type].rows.filter(row => row[idField] === newClickedRow.id)[0];
-    }
+    
+    idField = NearbyActivityStore.dataFields[newClickedRow.type].id_field;
+    infoField = NearbyActivityStore.dataFields[newClickedRow.type].info_field;
+    row = NearbyActivityStore[newClickedRow.type].rows.filter(row => row[idField] === newClickedRow.id)[0];
+
     if (import.meta.env.VITE_DEBUG == 'true') console.log('nearby click, newClickedRow:', newClickedRow, 'idField:', idField, 'row:', row);
     if (row.properties) row[infoField] = row.properties[infoField];
     const popup = document.getElementsByClassName('maplibregl-popup');
@@ -809,19 +460,18 @@ watch(
 
 const setLabelLayers = (newLabelLayers) => {
   if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue setLabelLayers, newLabelLayers:', newLabelLayers, 'map.getStyle().layers:', map.getStyle().layers);
-    if (newLabelLayers.length) {
-      newLabelLayers.forEach(layer => {
-        if (!map.getSource(layer.id)) {
-          // if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue setLabelLayers, NOT THERE, layer:', layer, 'layer.id:', layer.id, 'JSON.parse(JSON.stringify(layer.source)):', JSON.parse(JSON.stringify(layer.source)));
-          map.addSource(layer.id, JSON.parse(JSON.stringify(layer.source)));
-          map.addLayer(layer.layer, 'cyclomediaRecordings');
-        } else {
-          // if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue setLabelLayers, YES THERE, layer:', layer, 'layer.id:', layer.id, 'JSON.parse(JSON.stringify(layer.source)):', JSON.parse(JSON.stringify(layer.source)));
-          map.getSource(layer.id).setData(layer.source.data);
-        }
-      })
-    }
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue setLabelLayers, map.getStyle:', map.getStyle(), 'map.getStyle().layers:', map.getStyle().layers, 'map.getStyle().sources:', map.getStyle().sources);
+  if (newLabelLayers.length) {
+    newLabelLayers.forEach(layer => {
+      if (!map.getSource(layer.id)) {
+        // if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue setLabelLayers, NOT THERE, layer:', layer, 'layer.id:', layer.id, 'JSON.parse(JSON.stringify(layer.source)):', JSON.parse(JSON.stringify(layer.source)));
+        map.addSource(layer.id, JSON.parse(JSON.stringify(layer.source)));
+        map.addLayer(layer.layer, 'cyclomediaRecordings');
+      } else {
+        // if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue setLabelLayers, YES THERE, layer:', layer, 'layer.id:', layer.id, 'JSON.parse(JSON.stringify(layer.source)):', JSON.parse(JSON.stringify(layer.source)));
+        map.getSource(layer.id).setData(layer.source.data);
+      }
+    })
+  }
 }
 
 const removeAllCyclomediaMapLayers = () => {
@@ -1033,38 +683,11 @@ const turnOnEagleview = () => {
     />
     <EagleviewControl />
     <CyclomediaControl />
-    <!-- <EagleviewControl @toggle-eagleview="turnOnEagleview" />
-    <CyclomediaControl @toggle-cyclomedia="toggleCyclomedia" /> -->
-    <OpacitySlider
-      v-if="MainStore.currentTopic == 'deeds' && selectedRegmap"
-      :initial-opacity="MapStore.regmapOpacity"
-      @opacity-change="handleRegmapOpacityChange"
-    />
-    <OpacitySlider
-      v-if="MainStore.currentTopic == 'zoning'"
-      :initial-opacity="MapStore.zoningOpacity"
-      @opacity-change="handleZoningOpacityChange"
-    />
-    <OpacitySlider
-      v-if="MainStore.currentTopic == 'stormwater'"
-      :initial-opacity="MapStore.stormwaterOpacity"
-      @opacity-change="handleStormwaterOpacityChange"
-    />
     <!-- the distance measure control uses a ref, so that functions within the component can be called from this file -->
     <DistanceMeasureControl
       ref="distanceMeasureControlRef"
       @drawDelete="drawDelete"
       @drawCancel="drawCancel"
-    />
-    <OverlayLegend
-      v-show="!MapStore.imageryOn && ['stormwater'].includes(MainStore.currentTopic)"
-      :items="$config.stormwaterLegendData"
-      :options="{ shape: 'square' }"
-    />
-    <OverlayLegend
-      v-show="!MapStore.imageryOn && ['deeds', 'zoning'].includes(MainStore.currentTopic)"
-      :items="$config.dorLegendData"
-      :options="{ shape: 'square' }"
     />
   </div>
   <KeepAlive>
@@ -1075,13 +698,11 @@ const turnOnEagleview = () => {
       @update-camera-lng-lat="updateCyclomediaCameraLngLat"
     />
   </KeepAlive>
-    <!-- @turn-off-cyclomedia="turnOffCyclomedia" -->
   <KeepAlive>
     <EagleviewPanel
       v-if="MapStore.eagleviewOn"
     />
   </KeepAlive>
-  <!-- @toggle-eagleview="turnOnEagleview" -->
 </template>
 
 <style>

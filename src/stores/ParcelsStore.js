@@ -3,7 +3,6 @@ import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 import { useMainStore } from '@/stores/MainStore.js'
 import axios from 'axios';
 import useParcels from '@/composables/useParcels';
-import $config from '@/config';
 const { processParcels } = useParcels();
 
 export const useParcelsStore = defineStore('ParcelsStore', {
@@ -130,7 +129,7 @@ export const useParcelsStore = defineStore('ParcelsStore', {
           }
           this[`${parcelLayer}Checked`] = processedData;
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('in else, parcelLayer:', parcelLayer, '$config.parcelLayerForTopic[MainStore.currentTopic]:', $config.parcelLayerForTopic[MainStore.currentTopic]);
+          if (import.meta.env.VITE_DEBUG == 'true') console.log('in else, parcelLayer:', parcelLayer);
           this[`${parcelLayer}Checked`] = {};
         }
       } catch {

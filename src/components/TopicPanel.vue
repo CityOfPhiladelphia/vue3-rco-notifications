@@ -5,26 +5,11 @@ import { useMainStore } from '@/stores/MainStore.js'
 const GeocodeStore = useGeocodeStore();
 import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 const MainStore = useMainStore();
-import { useCondosStore } from '@/stores/CondosStore.js'
-const CondosStore = useCondosStore();
 
 import FullScreenTopicsToggleTab from '@/components/FullScreenTopicsToggleTab.vue';
 import AddressSearchControl from '@/components/AddressSearchControl.vue';
 
-import Topic from '@/components/Topic.vue';
-import AtlasIntro from '@/components/intros/AtlasIntro.vue';
-import CityAtlasIntro from '@/components/intros/CityAtlasIntro.vue';
-import VotingIntro from '@/components/intros/VotingIntro.vue';
-import Property from '@/components/topics/Property.vue';
-import Condos from '@/components/topics/Condos.vue';
-import Deeds from '@/components/topics/Deeds.vue';
-import LI from '@/components/topics/LI.vue';
-import Zoning from '@/components/topics/Zoning.vue';
-import Voting from '@/components/topics/Voting.vue';
-import NearbyActivity from '@/components/topics/nearbyActivity/NearbyActivity.vue';
-import City311 from '@/components/topics/cityAtlas/City311.vue';
-import Stormwater from '@/components/topics/cityAtlas/Stormwater.vue';
-import Districts from '@/components/topics/cityAtlas/Districts.vue';
+import RCOIntro from '@/components/intros/RCOIntro.vue';
 
 import { useRoute } from 'vue-router';
 
@@ -50,9 +35,7 @@ const zipCode = computed(() => {
   />
       
   <!-- FRONT PAGE CONTENT -->
-  <CityAtlasIntro v-if="route.name == 'home' && version == 'cityatlas'" />
-  <VotingIntro v-else-if="route.name == 'topic' && route.params.topic.toLowerCase() == 'voting'"/>
-  <AtlasIntro v-else-if="route.name == 'home'" />
+  <RCOIntro v-if="route.name == 'home'" />
 
   <!-- ADDRESS NOT FOUND CONTENT -->
   <div

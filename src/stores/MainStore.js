@@ -3,7 +3,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia';
 export const useMainStore = defineStore("MainStore", {
   state: () => {
     return {
-      appVersion: 'atlas',
+      appVersion: 'RCO Notifications',
       pageTitle: '',
       addressSearchRunning: false,
       datafetchRunning: false,
@@ -29,9 +29,6 @@ export const useMainStore = defineStore("MainStore", {
       fullScreenMapEnabled: false,
       fullScreenTopicsEnabled: false,
       windowDimensions: {},
-      // on election days, switch these two
-      currentTopic: 'property',
-      // currentTopic: 'voting',
     };
   },
 

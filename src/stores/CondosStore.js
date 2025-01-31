@@ -43,7 +43,7 @@ export const useCondosStore = defineStore('CondosStore', {
             }
             // if (import.meta.env.VITE_DEBUG == 'true') console.log('in condo-list, data:', data, 'state:', state);
             for (let feature of response.data.features) {
-              if (import.meta.env.VITE_DEBUG == 'true') console.log('feature.properties.address_low_frac:', feature.properties.address_low_frac, 'aisData.properties.address_low_frac:', aisData.properties.address_low_frac, 'feature.properties.street_address:', feature.properties.street_address, 'aisData.properties.street_address:', aisData.properties.street_address);
+              // if (import.meta.env.VITE_DEBUG == 'true') console.log('feature.properties.address_low_frac:', feature.properties.address_low_frac, 'aisData.properties.address_low_frac:', aisData.properties.address_low_frac, 'feature.properties.street_address:', feature.properties.street_address, 'aisData.properties.street_address:', aisData.properties.street_address);
               if (feature.properties.address_low_frac !== aisData.properties.address_low_frac || feature.properties.street_address === aisData.properties.street_address) {
                 // return;
                 response.data.total_size = response.data.total_size - 1;
