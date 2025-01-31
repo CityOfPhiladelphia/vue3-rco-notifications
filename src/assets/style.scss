@@ -1,0 +1,484 @@
+// @import 'bulma/css/bulma.css';
+// @import "@phila/phila-ui-core/dist/styles/scss/all.scss";
+
+$primary-color: #0f4254;
+$dropdown-menu-min-width: 100px;
+
+html {
+  min-height: 100dvh;
+  overflow-y: hidden !important;
+}
+
+body {
+  height: auto;
+  overflow-y: hidden !important;
+}
+
+a {
+  color: #0f4d90;
+  font-weight: bold;
+}
+
+#app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+  justify-content: space-evenly;
+}
+
+.main {
+  height: calc(100vh - 50px);
+  display: flex;
+  flex-direction: row;
+  padding-top: 42px !important;
+  margin-top: 0px !important;
+}
+
+.topics-holder {
+  display: flex;
+  flex-direction: column;
+  width: 50% !important;
+  padding: 0;
+  margin: 0;
+  height: calc(100vh - 110px);
+}
+
+.topics-holder-full {
+  width: 100% !important;
+}
+
+#topic-panel-no-topics {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.topic-panel-half {
+  max-width: 46%;
+}
+
+.bullet-list {
+  list-style-type: disc;
+  padding-left: 1.5em;
+}
+
+#topic-panel-content {
+  flex-grow: 1;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-bottom: 30px !important;
+}
+
+.map-panel-holder {
+  width: 50%;
+  height: calc(100vh - 110px);
+  margin-bottom: 0px;
+}
+
+.map-panel-holder-full {
+  width: 100% !important;
+}
+
+.address-holder {
+  color: #0f4d90 !important;
+  background-color: #DAEDFe;
+  display: flex;
+  flex-direction: column;
+  padding-left: 1em;
+  padding-bottom: .5em;
+  padding-top: .5em;
+
+  h1, h2, h3 {
+    color: #0f4d90 !important;
+  }
+}
+
+.address {
+  display: inline-block;
+  padding-left: .25em;
+}
+
+.invisible-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.invisible-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.map-panel {
+  height: calc(100vh - 110px);
+}
+
+.map-panel.cyclomedia-eagleview {
+  height: 50%;
+}
+
+.map-class {
+  height: 100%;
+}
+
+.map-cover {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.mobile-no-data {
+  display: none;
+}
+
+.data-section {
+  margin-bottom: 2rem;
+}
+
+.add-borders {
+  border: 1px solid #ccc;
+}
+
+.is-selected {
+  background-color: #ccc !important;
+}
+
+// for vue-good-tables pagination
+.vgt-wrap__footer {
+  padding: .4rem;
+  background: white !important;
+  background-color: white !important;
+  border-style: solid;
+  border-color: white;
+  margin-top: 3px;
+}
+
+.vgt-wrap__footer {
+  margin-top: 0px !important;
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+
+  .footer__navigation__page-info {
+    margin-right: 0px;
+  }
+
+  .footer__navigation > button:first-of-type {
+    margin-right: 0px;
+  }
+}
+
+.footer__row-count {
+  float: right !important;
+  margin-left: 2px;
+} 
+
+.footer__row-count__label, .footer__row-count__select {
+  font-size: 14px !important;
+}
+
+.footer__navigation {
+  float: right !important;
+}
+
+.footer__navigation__page-info {
+  font-style: normal;
+  color: rgb(68, 68, 68) !important;
+}
+
+.footer__row-count__label {
+  font-size: 12px !important;
+  color: rgb(68, 68, 68) !important;
+}
+
+.footer__row-count select {
+  border-top-style: solid !important;
+  border-top-width: 1px !important;
+  border-left-style: solid !important;
+  border-left-width: 1px !important;
+  border-bottom-style: solid !important;
+  border-bottom-width: 1px !important;
+  border-right-style: solid !important;
+  border-right-width: 1px !important;
+  padding-left: 1px;
+}
+
+.horizontal-table {
+  margin-bottom: .25rem;
+}
+
+.nearby-table {
+  cursor: pointer !important;
+}
+
+.topic-info {
+  padding-bottom: 1.5rem;
+}
+
+.title-col {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.badge {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+@media 
+only screen and (max-width: 768px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+  @supports (-webkit-touch-callout: none) {
+    /* CSS specific to iOS devices */ 
+    .main {
+      margin-top: 42px !important;
+    }
+  }
+  
+  @supports not (-webkit-touch-callout: none) {
+    /* CSS for other than iOS devices */ 
+  }
+
+  html {
+    min-height: 100dvh;
+    overflow-y: hidden;
+  }
+
+  body {
+    height: auto;
+    overflow-y: hidden;
+  }
+
+  #app {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    justify-content: space-evenly;
+  }
+
+  .main {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+  }
+
+  .topics-holder {
+    display: flex;
+    flex-direction: column;
+    width: 100% !important;
+    padding: 0;
+    margin: 0;
+    height: auto;
+  }
+
+  #topic-panel-content {
+    overflow-y: hidden;
+    overflow-x: hidden;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  #topic-panel-no-topics {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px !important;
+    padding-bottom: 30px !important;
+    flex-grow: 1;
+  }
+
+  .map-panel-holder {
+    padding-top: 28px !important;
+    width: 100%;
+    flex-grow: 1;
+    margin-bottom: 0px;
+  }
+
+  .address-holder {
+    color: #0f4d90 !important;
+    background-color: #DAEDFe;
+    display: flex;
+    flex-direction: column;
+    padding-left: 2.25em;
+    padding-bottom: .5em;
+    padding-top: .5em;
+
+    h3 {
+      color: #0f4d90 !important;
+    }
+  }
+
+  .address {
+    display: inline-block;
+    padding-left: .25em;
+  }
+
+  .map-panel {
+    height: 250px;
+  }
+
+  .map-panel.cyclomedia-eagleview {
+    height: 500px;
+  }
+
+  .map-class {
+    height: 250px;
+  }
+
+
+	/* Force table to not be like tables anymore */
+  .horizontal-table {
+    table, thead, tbody, th, td, tr {
+      display: block; 
+    }
+    
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr { 
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    
+    tr { border: 1px solid #ccc; }
+    
+    td { 
+      /* Behave  like a "row" */
+      border: none;
+      border-bottom: 1px solid #eee; 
+      position: relative;
+      padding-left: 90px !important;
+      padding-top: 9px !important;
+      min-height: 45px;
+    }
+    
+    td:before { 
+      /* Now like a table header */
+      position: absolute;
+      /* Top/left values mimic padding */
+      top: 9px;
+      left: 6px;
+      width: 95px; 
+      padding-right: 10px; 
+      word-wrap: break-word;
+      font-weight: bold;
+    }
+  }
+
+  .mobile-no-data {
+    display: block;
+    margin-bottom: 3rem;
+  }
+  
+}
+
+@media 
+only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+  .map-panel {
+    height: 500px;
+  }
+
+  .map-class {
+    height: 500px;
+  }
+
+  #topic-panel-no-topics {
+    min-height: calc(100vh - 570px) !important;
+    // height: 60dvh !important;
+  }
+
+  #topic-panel-content {
+    min-height: calc(100vh - 700px) !important;
+    // height: 60dvh !important;
+  }
+
+}
+
+.no-link-at-bottom {
+  margin-bottom: 2rem !important;
+}
+
+.vert-table {
+  margin-bottom: .5rem;
+}
+
+.vert-table-title {
+  margin-bottom: .5rem !important;
+}
+
+.table-title {
+  margin-bottom: 0px !important;
+}
+
+.table-subtitle {
+  margin-bottom: 0px !important;
+}
+
+.link-at-bottom {
+  margin-bottom: .5rem !important;
+}
+
+.table-link {
+  padding-left: 4px;
+  font-size: .875rem !important;
+}
+
+.active-hover td {
+  // background-color: #FFFF00 !important;
+  background-color: #F3D661 !important;
+}
+
+@media only screen and (min-width: 1024px) {
+  .title-col {
+    margin-left: 1rem;
+  }
+  .level-left {
+    margin-left: 1rem;
+  }
+  .level-right {
+    margin-right: 1rem;
+  }
+}
+
+.filter-label {
+  font-size: 1em;
+  font-weight: normal;
+}
+
+.filter-div {
+  display: flex;
+  align-items: center;
+}
+
+.skip-to-main-content-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: .5em;
+  background-color: #0f4d90;
+  color: white;
+  opacity: 0;
+  text-decoration: underline;
+}
+
+.skip-to-main-content-link:focus {
+  left: 0px;
+  top: 0px;
+  opacity: 1;
+}
+
+.skip-to-main-content-link:hover {
+  color: white;
+}
+
+.section-header {
+  padding: .5rem;
+  margin-bottom: .5rem;
+}
