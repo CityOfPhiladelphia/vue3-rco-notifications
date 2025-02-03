@@ -95,30 +95,6 @@ const emitValue = (value) => {
           class="dropdown-item"
           @click="emitValue('1996')"
         >1996</a>
-        <a
-          class="dropdown-item"
-          @click="emitValue('1962')"
-        >1962</a>
-        <a
-          class="dropdown-item"
-          @click="emitValue('1942')"
-        >1942</a>
-        <a
-          class="dropdown-item"
-          @click="emitValue('1910')"
-        >1910</a>
-        <a
-          class="dropdown-item"
-          @click="emitValue('1895')"
-        >1895</a>
-        <a
-          class="dropdown-item"
-          @click="emitValue('1875')"
-        >1875</a>
-        <a
-          class="dropdown-item"
-          @click="emitValue('1860')"
-        >1860</a>
       </div>
     </div>
   </div>

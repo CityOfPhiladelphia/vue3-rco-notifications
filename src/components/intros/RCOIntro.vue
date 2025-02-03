@@ -15,9 +15,6 @@ import AddressSearchControl from '@/components/AddressSearchControl.vue';
       <address-search-control :input-id="'address-bar-search-input'" />
     </div>
     <div :class="MainStore.fullScreenTopicsEnabled ? 'topic-panel-half': ''">
-      <h1 class="subtitle is-3">
-        Information
-      </h1>
       <div>
         The Philadelphia Zoning Code includes provisions to ensure that neighbors of proposed developments
         are notified and have an opportunity to provide input regarding zoning decisions that may impact
@@ -27,16 +24,18 @@ import AddressSearchControl from '@/components/AddressSearchControl.vue';
         This website is a tool to assist applicants with their Zoning Board of Adjustment (ZBA) community
         notification process as well as giving more information to community members and interested
         residents.
-        <br />
+        <br><br>
         This tool provides four pieces of information:
-        <ol class="splashList">
-            <li>Addresses of near neighbors that need to be notified.</li>
-            <li>Names and contact information for RCOs.</li>
-            <li>Contact information for other entities, such as the local Council District, Zoning Board of
-                Adjustment (ZBA) and Philadelphia City Planning Commission (PCPC) that need to be notified
-                through this process.</li>
-            <li>Templates for documents that applicants and RCOs are to use throughout this process.</li>
+        <br><br>
+        <ol class="intro-list">
+          <li>Addresses of near neighbors that need to be notified.</li>
+          <li>Names and contact information for RCOs.</li>
+          <li>Contact information for other entities, such as the local Council District, Zoning Board of
+              Adjustment (ZBA) and Philadelphia City Planning Commission (PCPC) that need to be notified
+              through this process.</li>
+          <li>Templates for documents that applicants and RCOs are to use throughout this process.</li>
         </ol>
+        <br><br>
         To complete the notification process per
         <a class="clickable"
             href="https://codelibrary.amlegal.com/codes/philadelphia/latest/philadelphia_pa/0-0-0-205502#JD_14-303(11A)"

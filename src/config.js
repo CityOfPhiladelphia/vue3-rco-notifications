@@ -113,48 +113,6 @@ const imageryInfo = {
       type: 'raster',
       tileSize: 256,
     },
-    1962: {
-      tiles: [
-        'https://tiles.arcgis.com/tiles/fLeGjb7u4uXqeF9q/arcgis/rest/services/HistoricLandUse_1962/MapServer/tile/{z}/{y}/{x}',
-      ],
-      type: 'raster',
-      tileSize: 256,
-    },
-    1942: {
-      tiles: [
-        'https://tiles.arcgis.com/tiles/fLeGjb7u4uXqeF9q/arcgis/rest/services/HistoricLandUse_1942/MapServer/tile/{z}/{y}/{x}',
-      ],
-      type: 'raster',
-      tileSize: 256,
-    },
-    1910: {
-      tiles: [
-        'https://tiles.arcgis.com/tiles/fLeGjb7u4uXqeF9q/arcgis/rest/services/HistoricBromleyAtlas_1910/MapServer/tile/{z}/{y}/{x}',
-      ],
-      type: 'raster',
-      tileSize: 256,
-    },
-    1895: {
-      tiles: [
-        'https://tiles.arcgis.com/tiles/fLeGjb7u4uXqeF9q/arcgis/rest/services/HistoricBromleyAtlas_1895/MapServer/tile/{z}/{y}/{x}',
-      ],
-      type: 'raster',
-      tileSize: 256,
-    },
-    1875: {
-      tiles: [
-        'https://tiles.arcgis.com/tiles/fLeGjb7u4uXqeF9q/arcgis/rest/services/HistoricGMHopkinsAtlas_1875/MapServer/tile/{z}/{y}/{x}',
-      ],
-      type: 'raster',
-      tileSize: 256,
-    },
-    1860: {
-      tiles: [
-        'https://tiles.arcgis.com/tiles/fLeGjb7u4uXqeF9q/arcgis/rest/services/HistoricHexamerLocherAtlas_1860/MapServer/tile/{z}/{y}/{x}',
-      ],
-      type: 'raster',
-      tileSize: 256,
-    },
     cyclomediaRecordings: {
       type: 'geojson',
       data: {
@@ -1231,36 +1189,6 @@ const $config = {
     1996: {
       id: '1996',
       source: '1996',
-      type: 'raster',
-    },
-    1962: {
-      id: '1962',
-      source: '1962',
-      type: 'raster',
-    },
-    1942: {
-      id: '1942',
-      source: '1942',
-      type: 'raster',
-    },
-    1910: {
-      id: '1910',
-      source: '1910',
-      type: 'raster',
-    },
-    1895: {
-      id: '1895',
-      source: '1895',
-      type: 'raster',
-    },
-    1875: {
-      id: '1875',
-      source: '1875',
-      type: 'raster',
-    },
-    1860: {
-      id: '1860',
-      source: '1860',
       type: 'raster',
     },
   },

@@ -3,7 +3,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia';
 export const useMainStore = defineStore("MainStore", {
   state: () => {
     return {
-      appVersion: 'RCO Notifications',
+      appVersion: 'RCO Notifications for Zoning Applications',
       pageTitle: '',
       addressSearchRunning: false,
       datafetchRunning: false,

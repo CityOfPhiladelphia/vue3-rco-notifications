@@ -130,11 +130,7 @@ watch(
   }
 )
 const appTitle = computed(() => {
-  let version = 'RCO Notifications';
-  // if (import.meta.env.VITE_VERSION == 'cityatlas'){
-  //   version = 'CityAtlas';
-  // }
-  return version;
+  return 'RCO Notifications for Zoning Applications';
 })
 
 </script>
