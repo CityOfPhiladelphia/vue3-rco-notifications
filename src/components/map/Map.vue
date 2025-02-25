@@ -26,6 +26,8 @@ import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 const GeocodeStore = useGeocodeStore();
 import { useParcelsStore } from '@/stores/ParcelsStore.js'
 const ParcelsStore = useParcelsStore();
+import { useRcoParcelsStore } from '@/stores/RcoParcelsStore';
+const RcoParcelsStore = useRcoParcelsStore();
 // import { useCity311Store } from '@/stores/City311Store';
 // const City311Store = useCity311Store();
 
@@ -228,13 +230,13 @@ watch(
 });
 
 // watch dor parcel coordinates for moving dor parcel
-const selectedParcelId = computed(() => { return MainStore.selectedParcelId; });
-const dorCoordinates = computed(() => {
+// const selectedParcelId = computed(() => { return MainStore.selectedParcelId; });
+const pwdParcelCoordinates = computed(() => {
   let value;
-  // if (import.meta.env.VITE_DEBUG == 'true') console.log('computed dorCoordinates, selectedParcelId.value:', selectedParcelId.value, 'ParcelsStore.dor', ParcelsStore.dor);
-  if (selectedParcelId.value && ParcelsStore.dor.features && ParcelsStore.dor.features.filter(parcel => parcel.id === selectedParcelId.value)[0]) {
-    const parcel = ParcelsStore.dor.features.filter(parcel => parcel.id === selectedParcelId.value)[0];
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('computed, not watch, selectedParcelId.value:', selectedParcelId.value, 'ParcelsStore.dor.features.filter(parcel => parcel.id === selectedParcelId.value)[0]:', ParcelsStore.dor.features.filter(parcel => parcel.id === selectedParcelId.value)[0]);
+  // if (import.meta.env.VITE_DEBUG == 'true') console.log('computed dorCoordinates, selectedParcelId.value:', selectedParcelId.value, 'ParcelsStore.pwd', ParcelsStore.pwd);
+  if (ParcelsStore.pwd.features && ParcelsStore.pwd.features[0]) {
+    const parcel = ParcelsStore.pwd.features[0];
+    // if (import.meta.env.VITE_DEBUG == 'true') console.log('computed, not watch, selectedParcelId.value:', selectedParcelId.value, 'ParcelsStore.pwd.features.filter(parcel => parcel.id === selectedParcelId.value)[0]:', ParcelsStore.pwd.features.filter(parcel => parcel.id === selectedParcelId.value)[0]);
     if (parcel.geometry.type === 'Polygon') {
       value = parcel.geometry.coordinates[0];
     } else if (parcel.geometry.type === 'MultiPolygon') {
@@ -247,16 +249,16 @@ const dorCoordinates = computed(() => {
 });
 
 watch(
-  () => dorCoordinates.value,
+  () => pwdParcelCoordinates.value,
   newCoords => {
-  if (import.meta.env.VITE_DEBUG == 'true') console.log('Map dorCoordinates watch, newCoords:', newCoords);
+  if (import.meta.env.VITE_DEBUG == 'true') console.log('Map pwdCoordinates watch, newCoords:', newCoords);
   let newParcel;
   if (newCoords.length > 3) {
     newParcel = polygon([ newCoords ]);
-    map.getSource('dorParcel').setData(newParcel);
+    map.getSource('pwdParcel').setData(newParcel);
   } else {
     newParcel = multiPolygon(newCoords);
-    map.getSource('dorParcel').setData(newParcel);
+    map.getSource('pwdParcel').setData(newParcel);
   }
 });
 
@@ -291,6 +293,28 @@ const setImagery = async (newImagery) => {
   await map.addLayer($config.mapLayers[imagerySelected.value], 'imageryLabels')
   map.removeLayer(oldLayer);
 }
+
+watch(
+  () => MapStore.bufferForParcel,
+  async newBuffer => {
+    if (import.meta.env.VITE_DEBUG) console.log('Map.vue bufferForAddressOrLocationOrZipcode watch, newBuffer:', newBuffer);
+    if (newBuffer && map.getSource('buffer')) {
+      map.getSource('buffer').setData(newBuffer);
+    } else if (map.getSource('buffer')) {
+      map.getSource('buffer').setData({ type: 'FeatureCollection', features: [] });
+    }
+  }
+)
+
+watch(
+  () => RcoParcelsStore.rco,
+  async newRcoParcels => {
+    if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newRcoParcels:', newRcoParcels);
+    if (newRcoParcels && map.getSource('rcoParcels')) {
+      map.getSource('rcoParcels').setData(newRcoParcels);
+    }
+  }
+)
 
 // for Nearby topic, watch the clicked row to fly to its coordinates and show a popup
 const clickedRow = computed(() => { return MainStore.clickedRow; })

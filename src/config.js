@@ -172,7 +172,7 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
         }
       }
     },
-    dorParcel: {
+    pwdParcel: {
       type: 'geojson',
       data: {
         type: 'Feature',
@@ -181,6 +181,23 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
           coordinates: [[[]]],
         }
       }
+    },
+    buffer: {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[]]],
+        }
+      }
+    },
+    rcoParcels: {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      },
     },
   },
   layers: [
@@ -193,6 +210,47 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
       id: 'pwdLabels',
       source: 'pwdLabels',
       type: 'raster',
+    },
+    {
+      id: 'rcoParcels',
+      type: 'fill',
+      source: 'rcoParcels',
+      layout: {},
+      paint: {
+        'fill-color': '#e6987c',
+        'fill-opacity': 0.3,
+      },
+    },
+    {
+      id: 'rcoParcelsLine',
+      type: 'line',
+      source: 'rcoParcels',
+      layout: {},
+      paint: {
+        'line-color': '#e6987c',
+        'line-width': 2,
+      }
+    },
+    {
+      id: 'buffer',
+      type: 'fill',
+      source: 'buffer',
+      layout: {},
+      paint: {
+        'fill-color': '#6dd7e3',
+        'fill-opacity': 0.2,
+        'fill-outline-color': '#6dd7e3',
+      }
+    },
+    {
+      id: 'bufferLine',
+      type: 'line',
+      source: 'buffer',
+      layout: {},
+      paint: {
+        'line-color': '#6dd7e3',
+        'line-width': 2,
+      }
     },
     {
       id: 'cyclomediaRecordings',
@@ -229,6 +287,26 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
         'fill-color': 'rgb(0,102,255)',
         'fill-opacity': 0.2,
       },
+    },
+    {
+      id: 'pwdParcel',
+      type: 'fill',
+      source: 'pwdParcel',
+      layout: {},
+      paint: {
+        'fill-color': 'white',
+        'fill-opacity': 0.5
+      }
+    },
+    {
+      id: 'pwdParcelLine',
+      type: 'line',
+      source: 'pwdParcel',
+      layout: {},
+      paint: {
+        'line-color': 'red',
+        'line-width': 2
+      }
     },
     {
       id: 'addressMarker',

@@ -1,15 +1,18 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import buffer from '@turf/buffer';
 import { point } from '@turf/helpers';
+import { useParcelsStore } from './ParcelsStore';
 
 export const useMapStore = defineStore("MapStore", {
   state: () => {
     return {
       map: {},
+      searchDistance: 250,
       currentMapStyle: 'pwdDrawnMapStyle',
       currentAddressCoords: [],
       // currentTopicMapStyle: {},
       bufferForAddress: {},
+      bufferForParcel: {},
       currentMarkersForTopic: [],
       addressMarker: null,
       addressParcel: null,
@@ -49,12 +52,13 @@ export const useMapStore = defineStore("MapStore", {
     setMapStyle(style) {
       this.currentMapStyle = style;
     },
-    async fillBufferForAddress(lng, lat) {
-      let thePoint = point([lng, lat])
-      let theBuffer = buffer(thePoint, 750, {units: 'feet'});
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillBufferForAddress is running, thePoint:', thePoint, 'theBuffer:', theBuffer, 'lng:', lng, 'lat:', lat);
-      this.bufferForAddress = theBuffer.geometry.coordinates;
-    }
+    async fillBufferForParcel() {
+      if (import.meta.env.VITE_DEBUG) console.log('fillBufferForParcel is running');
+      if (useParcelsStore().pwd) {
+        let parcel = useParcelsStore().pwd.features[0];
+        this.bufferForParcel= buffer(parcel, this.searchDistance, {units: 'feet'});
+      }
+    },
   },
 });
 

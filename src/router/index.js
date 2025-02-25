@@ -7,6 +7,8 @@ import { useParcelsStore } from '@/stores/ParcelsStore.js'
 import { useOpaStore } from '@/stores/OpaStore.js'
 import { useDorStore } from '@/stores/DorStore.js'
 import { useMainStore } from '@/stores/MainStore.js'
+import { useMapStore } from '@/stores/MapStore.js'
+import { useRcoParcelsStore } from '@/stores/RcoParcelsStore';
 
 import { useCondosStore } from '@/stores/CondosStore.js'
 
@@ -128,7 +130,6 @@ const dataFetch = async(to, from) => {
     MainStore.datafetchRunning = false;
     return;
   }
-
   
   let address;
   if (to.params.address) { address = to.params.address } else if (to.query.address) { address = to.query.address }
@@ -171,6 +172,15 @@ const dataFetch = async(to, from) => {
   CondosStore.loadingCondosData = true;
   await CondosStore.fillCondoData(address);
   CondosStore.loadingCondosData = false;
+
+  // buffer around the parcel
+  const MapStore = useMapStore();
+  await MapStore.fillBufferForParcel();
+
+  // get neighboring parcels
+  const RcoParcelsStore = useRcoParcelsStore();
+  await RcoParcelsStore.fillRcoParcelDataByBuffer();
+  await RcoParcelsStore.fillOpaPropertiesPublic();
 
   MainStore.lastSearchMethod = null;
   MainStore.datafetchRunning = false;
