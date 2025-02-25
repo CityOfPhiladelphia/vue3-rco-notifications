@@ -26,7 +26,7 @@ const router = useRouter();
 import { onMounted, computed, getCurrentInstance, watch } from 'vue';
 
 // COMPONENTS
-import TopicPanel from '@/components/TopicPanel.vue';
+import LeftPanel from '@/components/LeftPanel.vue';
 import MapPanel from '@/components/MapPanel.vue';
 
 const instance = getCurrentInstance();
@@ -164,7 +164,7 @@ const appTitle = computed(() => {
       class="topics-holder"
       :class="fullScreenTopicsEnabled ? 'topics-holder-full' : ''"
     >
-      <topic-panel />
+      <left-panel />
     </div>
 
     <!-- MAP PANEL ON RIGHT - right now only contains the address input -->

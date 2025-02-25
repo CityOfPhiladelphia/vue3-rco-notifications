@@ -253,7 +253,7 @@ router.afterEach(async (to, from) => {
   if (to.query.lang !== from.query.lang) {
     MainStore.currentLang = to.query.lang;
   }
-  if (to.name !== 'not-found' && to.name !== 'search') {
+  if (to.name !== 'not-found' && to.name !== 'search' && to.name !== 'home') {
     MainStore.addressSearchRunning = false;
     await dataFetch(to, from);
     let pageTitle = MainStore.appVersion;

@@ -9,6 +9,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     return {
       rco: {},
       opaPropertiesPublic: {},
+      units: {},
     };
   },
   actions: {
@@ -28,23 +29,24 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         data.rows = data.rows.filter(a => !Object.keys(units).includes(a.pwd_parcel_id));
       }
   
-      for (let unit in units) {
-        console.log('inside units loop, units:', units, 'units[unit]:', units[unit], 'typeof(units[unit]):', typeof(units[unit]));
-        if (typeof(units[unit]) === 'function') {
-          break;
-        }
-        for (let i in bldgRecord) {
-          bldgRecord[i] = "";
-        }
-        let bldgRecordPush = JSON.parse(JSON.stringify(bldgRecord));
-        bldgRecordPush.owner_1 = "Condominium (" + units[unit].length + " Units)";
-        bldgRecordPush.owner_2 = null;
-        bldgRecordPush.location = units[unit][0].location;
-        bldgRecordPush.condo = true;
-        bldgRecordPush.pwd_parcel_id = units[unit][0].pwd_parcel_id;
-        data.rows.push(bldgRecordPush);
-      }
-      return data;
+      // for (let unit in units) {
+      //   console.log('inside units loop, units:', units, 'units[unit]:', units[unit], 'typeof(units[unit]):', typeof(units[unit]));
+      //   if (typeof(units[unit]) === 'function') {
+      //     break;
+      //   }
+      //   for (let i in bldgRecord) {
+      //     bldgRecord[i] = "";
+      //   }
+      //   let bldgRecordPush = JSON.parse(JSON.stringify(bldgRecord));
+      //   bldgRecordPush.owner_1 = "Condominium (" + units[unit].length + " Units)";
+      //   bldgRecordPush.owner_2 = null;
+      //   bldgRecordPush.location = units[unit][0].location;
+      //   bldgRecordPush.condo = true;
+      //   bldgRecordPush.pwd_parcel_id = units[unit][0].pwd_parcel_id;
+      //   data.rows.push(bldgRecordPush);
+      // }
+      this.units = units;
+      this.opaPropertiesPublic = Object.groupBy(dataList, a => a.pwd_parcel_id);
     },
     async fillOpaPropertiesPublic() {
       try {
@@ -56,7 +58,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         // const response = await fetch(`https://api.phila.gov/ais/v1/search/${encodeURIComponent(opaSet)}?opa_only=true&include_units=true`)
         if (response.ok) {
           let data = await response.json();
-          data = this.evaluateDataForUnits(data);
+          // data = this.evaluateDataForUnits(data);
           this.opaPropertiesPublic = data;
         } else {
           if (import.meta.env.VITE_DEBUG == 'true') console.warn('opaData - await resolved but HTTP status was not successful')

@@ -54,7 +54,7 @@ export const useMapStore = defineStore("MapStore", {
     },
     async fillBufferForParcel() {
       if (import.meta.env.VITE_DEBUG) console.log('fillBufferForParcel is running');
-      if (useParcelsStore().pwd) {
+      if (useParcelsStore().pwd.features.length > 0) {
         let parcel = useParcelsStore().pwd.features[0];
         this.bufferForParcel= buffer(parcel, this.searchDistance, {units: 'feet'});
       }

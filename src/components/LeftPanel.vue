@@ -5,6 +5,12 @@ import { useMainStore } from '@/stores/MainStore.js'
 const GeocodeStore = useGeocodeStore();
 import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 const MainStore = useMainStore();
+import { useRcoParcelsStore } from '@/stores/RcoParcelsStore.js'
+const RcoParcelsStore = useRcoParcelsStore();
+
+import CustomPaginationLabels from '@/components/pagination/CustomPaginationLabels.vue';
+import useTables from '@/composables/useTables';
+const { paginationOptions } = useTables();
 
 import FullScreenTopicsToggleTab from '@/components/FullScreenTopicsToggleTab.vue';
 import AddressSearchControl from '@/components/AddressSearchControl.vue';
@@ -25,6 +31,44 @@ const zipCode = computed(() => {
     return GeocodeStore.aisData.features[0].properties.zip_code + '-' + GeocodeStore.aisData.features[0].properties.zip_4;
   }
   return '';
+});
+
+const addressesTableData = computed(() => {
+  return {
+    columns: [
+      {
+        label: 'Address',
+        field: 'address',
+        filterable: true,
+        sortable: true,
+      },
+      {
+        label: 'RCO',
+        field: 'rco',
+        filterable: true,
+        sortable: true,
+      },
+      {
+        label: 'Civic Association',
+        field: 'civic_association',
+        filterable: true,
+        sortable: true,
+      },
+      {
+        label: 'Ward',
+        field: 'ward',
+        filterable: true,
+        sortable: true,
+      },
+      {
+        label: 'Division',
+        field: 'division',
+        filterable: true,
+        sortable: true,
+      },
+    ],
+    rows: RcoParcelsStore.opaPropertiesPublic.rows,
+  }
 });
 
 </script>
@@ -60,7 +104,7 @@ const zipCode = computed(() => {
     </div>
   </div>
 
-  <!-- IF AN ADDRESS IS LOADED, SHOW THE TOPICS  -->
+  <!-- IF AN ADDRESS IS LOADED, SHOW THE DATA  -->
   <div
     v-if="route.name !== 'home' && route.name !== 'not-found' && address"
     class="address-holder"
@@ -78,6 +122,37 @@ const zipCode = computed(() => {
       <address-search-control :input-id="'address-bar-search-input'" />
     </div>
   </div>
+
+  <vue-good-table
+    v-if="route.name !== 'home' && route.name !== 'not-found' && addressesTableData.rows.length > 0"
+    id="addresses"
+    :columns="addressesTableData.columns"
+    :rows="addressesTableData.rows"
+    :pagination-options="paginationOptions(addressesTableData.rows.length)"
+    style-class="table"
+  >
+    <template #emptystate>
+      <div v-if="RcoParcelsStore.loadingRcoParcels">
+        Loading addresses... <font-awesome-icon
+          icon="fa-solid fa-spinner"
+          spin
+        />
+      </div>
+      <div v-else>
+        No addresses found for the selected building
+      </div>
+    </template>
+    <template #pagination-top="props">
+      <custom-pagination-labels
+        :mode="'pages'"
+        :total="props.total"
+        :perPage="5"
+        @page-changed="props.pageChanged"
+        @per-page-changed="props.perPageChanged"
+      >
+      </custom-pagination-labels>
+    </template>
+  </vue-good-table>
 
 </template>
 
