@@ -134,14 +134,14 @@ const propertiesTableData = computed(() => {
   return {
     columns: [
       {
-        label: 'Address',
+        label: 'Property',
         field: 'parcel_address',
         html: true,
         // filterable: true,
         // sortable: true,
       },
       {
-        label: 'Mailing Address',
+        label: 'Contact Mailing Address',
         field: 'mail_contact',
         html: true,
       },
@@ -326,7 +326,7 @@ const exportProperties = () => {
           icon="fa-solid fa-spinner"
           spin
         />
-        <span v-else>({{ rcoParcelsLength }})</span>
+        <span v-else>({{ opaPropertiesLength }})</span>
       </h2>
       <div
         v-if="propertiesTableData.rows"
