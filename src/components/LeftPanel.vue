@@ -130,7 +130,7 @@ const rcosTableData = computed(() => {
   }
 });
 
-const addressesTableData = computed(() => {
+const propertiesTableData = computed(() => {
   return {
     columns: [
       {
@@ -171,6 +171,24 @@ const exportRcos = () => {
   document.body.appendChild(link);
   link.click();
 };
+
+const exportProperties = () => {
+  let csvContent = 'data:text/csv;charset=utf-8,Address, Mailing Address\n';
+  let encodedUri = encodeURI(csvContent);
+  rcoParcels.value.forEach(item => {
+    let newCsvContent = '';
+    newCsvContent += item.parcel_address.replaceAll(',', '') + ',';
+    newCsvContent += item.mail_contact.replaceAll(',', '');
+    let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
+    encodedUri += newEncodedUri;
+  });
+  console.log('csvContent:', csvContent, 'encodedUri:', encodedUri);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', 'properties.csv');
+  document.body.appendChild(link);
+  link.click();
+}
 
 </script>
 
@@ -243,9 +261,9 @@ const exportRcos = () => {
         v-if="rcosTableData.rows"
         class="horizontal-table"
       >
-      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && addressesTableData.rows && addressesTableData.rows.length > 0" -->
+      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
         <vue-good-table
-          id="addresses"
+          id="properties"
           :columns="rcosTableData.columns"
           :rows="rcosTableData.rows"
           :pagination-options="paginationOptions(rcosTableData.rows.length)"
@@ -297,7 +315,7 @@ const exportRcos = () => {
 
     <div class="data-section">
       <h2 class="subtitle mb-3 is-5 table-title">
-        Addresses
+        Properties
         <font-awesome-icon
           v-if="RcoParcelsStore.loadingOpaPropertiesPublic"
           icon="fa-solid fa-spinner"
@@ -306,27 +324,36 @@ const exportRcos = () => {
         <span v-else>({{ rcoParcelsLength }})</span>
       </h2>
       <div
-        v-if="addressesTableData.rows"
+        v-if="propertiesTableData.rows"
         class="horizontal-table"
       >
-      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && addressesTableData.rows && addressesTableData.rows.length > 0" -->
+      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
         <vue-good-table
-          id="addresses"
-          :columns="addressesTableData.columns"
-          :rows="addressesTableData.rows"
-          :pagination-options="paginationOptions(addressesTableData.rows.length)"
+          id="properties"
+          :columns="propertiesTableData.columns"
+          :rows="propertiesTableData.rows"
+          :pagination-options="paginationOptions(propertiesTableData.rows.length)"
           style-class="table"
         >
           <template #emptystate>
             <div v-if="RcoParcelsStore.loadingOpaPropertiesPublic">
-              Loading addresses... <font-awesome-icon
+              Loading properties... <font-awesome-icon
                 icon="fa-solid fa-spinner"
                 spin
               />
             </div>
             <div v-else>
-              No addresses found for the selected building
+              No properties found for the selected building
             </div>
+          </template>
+
+          <template #table-actions>
+            <button
+              class="button is-small is-primary"
+              @click="exportProperties()"
+            >
+              Export Properties
+            </button>
           </template>
 
           <!-- <template #table-row="props">
