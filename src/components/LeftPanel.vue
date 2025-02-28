@@ -57,8 +57,8 @@ const rcoParcelsCompareFn = (a, b) => {
   }
   return 0;
 };
-const rcoParcels = computed(() => { if (RcoParcelsStore.opaPropertiesPublic.rows) return [ ...RcoParcelsStore.opaPropertiesPublic.rows ].sort(rcoParcelsCompareFn) });
-const rcoParcelsLength = computed(() => rcoParcels.value && rcoParcels.value.length ? rcoParcels.value.length : 0);
+const opaProperties = computed(() => { if (RcoParcelsStore.opaPropertiesPublic.rows) return [ ...RcoParcelsStore.opaPropertiesPublic.rows ].sort(rcoParcelsCompareFn) });
+const opaPropertiesLength = computed(() => opaProperties.value && opaProperties.value.length ? opaProperties.value.length : 0);
 
 // const rcosTableData = computed(() => {
 //   return {
@@ -146,7 +146,7 @@ const propertiesTableData = computed(() => {
         html: true,
       },
     ],
-    rows: rcoParcels.value || [],
+    rows: opaProperties.value || [],
   }
 });
 
@@ -173,12 +173,15 @@ const exportRcos = () => {
 };
 
 const exportProperties = () => {
-  let csvContent = 'data:text/csv;charset=utf-8,Address, Mailing Address\n';
+  let csvContent = 'data:text/csv;charset=utf-8,Property, Contact Mailing Address\n';
   let encodedUri = encodeURI(csvContent);
-  rcoParcels.value.forEach(item => {
+  opaProperties.value.forEach(item => {
     let newCsvContent = '';
-    newCsvContent += item.parcel_address.replaceAll(',', '') + ',';
-    newCsvContent += item.mail_contact.replaceAll(',', '');
+    newCsvContent+=`${item.address_std.replaceAll(',', '')} Philadelphia PA ${item.zip_code},`;
+    if (item.mailing_care_of) newCsvContent+=`${item.mailing_care_of.replaceAll(',', '')} `;
+    if (item.mailing_address_1) newCsvContent+=`${item.mailing_address_1.replaceAll(',', '')} `;
+    if (item.mailing_address_2) newCsvContent+=`${item.mailing_address_2.replaceAll(',', '')} `;
+    newCsvContent+=`${item.mailing_street} ${item.mailing_city_state} ${item.mailing_zip}`;
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
     encodedUri += newEncodedUri;
   });

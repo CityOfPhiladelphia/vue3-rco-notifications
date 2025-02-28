@@ -22,7 +22,7 @@ const clearStoreData = async() => {
   MainStore.clearDataSourcesLoadedArray();
 
   const RcoParcelsStore = useRcoParcelsStore();
-  RcoParcelsStore.clearAllRcoParcelsData();
+  RcoParcelsStore.clearAllPwdParcelsData();
 
   // const OpaStore = useOpaStore();
   // OpaStore.clearAllOpaData();

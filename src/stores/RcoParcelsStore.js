@@ -12,17 +12,17 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     return {
       rcos: {},
       loadingRcos: false,
-      rcoParcels: {},
-      loadingRcoParcels: false,
+      pwdParcels: {},
+      loadingPwdParcels: false,
       opaPropertiesPublic: {},
       loadingOpaPropertiesPublic: false,
       units: {},
     };
   },
   actions: {
-    async clearAllRcoParcelsData() {
-      // this.loadingRcoParcels = true;
-      // this.rcoParcels = {};
+    async clearAllPwdParcelsData() {
+      // this.loadingPwdParcels = true;
+      // this.pwdParcels = {};
       this.loadingRcos = true;
       this.rcos = {};
       this.loadingOpaPropertiesPublic = true;
@@ -66,7 +66,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     },
     async fillOpaPropertiesPublic() {
       try {
-        const opaSet = this.rcoParcels.features.map((feature) => feature.properties.PARCEL_ID).join("','");
+        const opaSet = this.pwdParcels.features.map((feature) => feature.properties.PARCEL_ID).join("','");
         const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+pwd_parcel_id+in+(%27${opaSet}%27)`);
         // const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+parcel_number+in+(%27${opaSet}%27)`);
         if (response.ok) {
@@ -74,13 +74,13 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           console.log('data:', data);
           data.rows.forEach(item => {
             console.log('item:', item);
-            item.parcel_address = `${item.address_std} \n PHILADELPHIA, PA ${item.zip_code}`;
+            item.parcel_address = `${item.address_std}<br>PHILADELPHIA, PA ${item.zip_code}`;
 
             item.mail_contact = '';
-            if (item.mailing_care_of) item.mail_contact +=`${item.mailing_care_of} \n `;
-            if (item.mailing_address_1) item.mail_contact+=`${item.mailing_address_1} \n `;
-            if (item.mailing_address_2) item.mail_contact+=`${item.mailing_address_2} \n `;
-            item.mail_contact += `${item.mailing_street}\n${item.mailing_city_state} ${item.mailing_zip}`;//  ${phoneNumber(item.properties.PRIMARY_PHONE)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
+            if (item.mailing_care_of) item.mail_contact +=`${item.mailing_care_of}<br>`;
+            if (item.mailing_address_1) item.mail_contact+=`${item.mailing_address_1}<br>`;
+            if (item.mailing_address_2) item.mail_contact+=`${item.mailing_address_2}<br>`;
+            item.mail_contact += `${item.mailing_street}<br>${item.mailing_city_state} ${item.mailing_zip}`;//  ${phoneNumber(item.properties.PRIMARY_PHONE)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
           });
           this.opaPropertiesPublic = data;
           this.loadingOpaPropertiesPublic = false;
@@ -182,17 +182,17 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
-          this.rcoParcels = data;
-          this.loadingRcoParcels = false;
+          this.pwdParcels = data;
+          this.loadingPwdParcels = false;
         } else {
           if (import.meta.env.VITE_DEBUG == 'true') console.log('in else');
-          this.rcoParcels = {};
-          this.loadingRcoParcels = false;
+          this.pwdParcels = {};
+          this.loadingPwdParcels = false;
         }
       } catch {
         if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillRcoParcelDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
-        this.rcoParcels = {};
-        this.loadingRcoParcels = false;
+        this.pwdParcels = {};
+        this.loadingPwdParcels = false;
       }
     },
   },
