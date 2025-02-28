@@ -33,43 +33,144 @@ const zipCode = computed(() => {
   return '';
 });
 
+// RCOs
+const rcosCompareFn = (a, b) => {
+  if (a.ORGANIZATION_NAME < b.ORGANIZATION_NAME) {
+    return -1;
+  }
+  if (a.ORGANIZATION_NAME > b.ORGANIZATION_NAME) {
+    return 1;
+  }
+  return 0;
+};
+const rcos = computed(() => { if (RcoParcelsStore.rcos.features) return [ ...RcoParcelsStore.rcos.features ].sort(rcosCompareFn) });
+const rcosLength = computed(() => rcos.value && rcos.value.length ? rcos.value.length : 0);
+
+
+// RCO PARCELS
+const rcoParcelsCompareFn = (a, b) => {
+  if (a.address_std < b.address_std) {
+    return -1;
+  }
+  if (a.address_std > b.address_std) {
+    return 1;
+  }
+  return 0;
+};
+const rcoParcels = computed(() => { if (RcoParcelsStore.opaPropertiesPublic.rows) return [ ...RcoParcelsStore.opaPropertiesPublic.rows ].sort(rcoParcelsCompareFn) });
+const rcoParcelsLength = computed(() => rcoParcels.value && rcoParcels.value.length ? rcoParcels.value.length : 0);
+
+// const rcosTableData = computed(() => {
+//   return {
+//     columns: [
+//       {
+//         label: 'Organization Name',
+//         field: 'properties.ORGANIZATION_NAME',
+//         filterable: true,
+//         sortable: true,
+//       },
+//       {
+//         label: 'Email',
+//         field: 'properties.PRIMARY_EMAIL',
+//         filterable: true,
+//         sortable: true,
+//       },
+//       {
+//         label: 'Address',
+//         field: 'properties.ORGANIZATION_ADDRESS',
+//         filterable: true,
+//         sortable: true,
+//       },
+//       {
+//         label: 'Organization Name',
+//         field: 'properties.PRIMARY_NAME',
+//         filterable: true,
+//         sortable: true,
+//       },
+//       {
+//         label: 'Address',
+//         field: 'properties.PRIMARY_ADDRESS',
+//         filterable: true,
+//         sortable: true,
+//       },
+//       {
+//         label: 'Phone',
+//         field: 'properties.PRIMARY_PHONE',
+//         filterable: true,
+//         sortable: true,
+//       },
+//     ],
+//     rows: rcos.value,
+//   }
+// });
+
+const rcosTableData = computed(() => {
+  return {
+    columns: [
+      {
+        label: 'RCO',
+        field: 'properties.rco',
+        html: true,
+      },
+      {
+        label: 'Meeting Address',
+        field: 'properties.MEETING_LOCATION_ADDRESS',
+      },
+      {
+        label: 'Primary Contact',
+        field: 'properties.contact',
+        html: true,
+      },
+      {
+        label: 'Preferred Method',
+        field: 'properties.PREFFERED_CONTACT_METHOD',
+      },
+    ],
+    rows: rcos.value || [],
+  }
+});
+
 const addressesTableData = computed(() => {
   return {
     columns: [
       {
         label: 'Address',
-        field: 'address',
-        filterable: true,
-        sortable: true,
+        field: 'parcel_address',
+        html: true,
+        // filterable: true,
+        // sortable: true,
       },
       {
-        label: 'RCO',
-        field: 'rco',
-        filterable: true,
-        sortable: true,
-      },
-      {
-        label: 'Civic Association',
-        field: 'civic_association',
-        filterable: true,
-        sortable: true,
-      },
-      {
-        label: 'Ward',
-        field: 'ward',
-        filterable: true,
-        sortable: true,
-      },
-      {
-        label: 'Division',
-        field: 'division',
-        filterable: true,
-        sortable: true,
+        label: 'Mailing Address',
+        field: 'mail_contact',
+        html: true,
       },
     ],
-    rows: RcoParcelsStore.opaPropertiesPublic.rows,
+    rows: rcoParcels.value || [],
   }
 });
+
+const exportRcos = () => {
+  let csvContent = 'data:text/csv;charset=utf-8,Organization Name, Primary Email, Organization Address, Primary Name, Primary Address, Primary Phone\n';
+  let encodedUri = encodeURI(csvContent);
+  rcos.value.forEach(item => {
+    let newCsvContent = '';
+    newCsvContent += item.properties.ORGANIZATION_NAME.replaceAll(',', '') + ',';
+    newCsvContent += item.properties.PRIMARY_EMAIL.replaceAll(',', '') + ',';
+    newCsvContent += item.properties.ORGANIZATION_ADDRESS.replaceAll(',', '') + ',';
+    newCsvContent += item.properties.PRIMARY_NAME.replaceAll(',', '') + ',';
+    newCsvContent += item.properties.PRIMARY_ADDRESS.replaceAll(',', '') + ',';
+    newCsvContent += item.properties.PRIMARY_PHONE.replaceAll(',', '');
+    let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
+    encodedUri += newEncodedUri;
+  });
+  console.log('csvContent:', csvContent, 'encodedUri:', encodedUri);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', 'rcos.csv');
+  document.body.appendChild(link);
+  link.click();
+};
 
 </script>
 
@@ -123,36 +224,134 @@ const addressesTableData = computed(() => {
     </div>
   </div>
 
-  <vue-good-table
-    v-if="route.name !== 'home' && route.name !== 'not-found' && addressesTableData.rows.length > 0"
-    id="addresses"
-    :columns="addressesTableData.columns"
-    :rows="addressesTableData.rows"
-    :pagination-options="paginationOptions(addressesTableData.rows.length)"
-    style-class="table"
+  <div
+    v-if="route.name !== 'home' && route.name !== 'not-found'"
+    id="topic-panel-content"
+    class="topics"
   >
-    <template #emptystate>
-      <div v-if="RcoParcelsStore.loadingRcoParcels">
-        Loading addresses... <font-awesome-icon
+    <div class="data-section">
+      <h2 class="subtitle mb-3 is-5 table-title">
+        RCOs
+        <font-awesome-icon
+          v-if="RcoParcelsStore.loadingRcos"
           icon="fa-solid fa-spinner"
           spin
         />
-      </div>
-      <div v-else>
-        No addresses found for the selected building
-      </div>
-    </template>
-    <template #pagination-top="props">
-      <custom-pagination-labels
-        :mode="'pages'"
-        :total="props.total"
-        :perPage="5"
-        @page-changed="props.pageChanged"
-        @per-page-changed="props.perPageChanged"
+        <span v-else>({{ rcosLength }})</span>
+      </h2>
+      <div
+        v-if="rcosTableData.rows"
+        class="horizontal-table"
       >
-      </custom-pagination-labels>
-    </template>
-  </vue-good-table>
+      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && addressesTableData.rows && addressesTableData.rows.length > 0" -->
+        <vue-good-table
+          id="addresses"
+          :columns="rcosTableData.columns"
+          :rows="rcosTableData.rows"
+          :pagination-options="paginationOptions(rcosTableData.rows.length)"
+          style-class="table"
+        >
+          <template #emptystate>
+            <div v-if="RcoParcelsStore.loadingRcos">
+              Loading RCOs... <font-awesome-icon
+                icon="fa-solid fa-spinner"
+                spin
+              />
+            </div>
+            <div v-else>
+              No RCOs found for the selected building
+            </div>
+          </template>
+
+          <template #table-actions>
+            <button
+              class="button is-small is-primary"
+              @click="exportRcos()"
+            >
+              Export RCOs
+            </button>
+          </template>
+
+          <!-- <template #table-row="props">
+            <span v-if="props.column.label == 'Address'">
+              <span style="font-weight: bold; color: blue;">{{props.row.address_std}}</span> 
+            </span>
+            <span v-else>
+              {{props.formattedRow[props.column.field]}}
+            </span>
+          </template> -->
+
+          <template #pagination-top="props">
+            <custom-pagination-labels
+              :mode="'pages'"
+              :total="props.total"
+              :perPage="5"
+              @page-changed="props.pageChanged"
+              @per-page-changed="props.perPageChanged"
+            >
+            </custom-pagination-labels>
+          </template>
+        </vue-good-table>
+      </div>
+    </div>
+
+    <div class="data-section">
+      <h2 class="subtitle mb-3 is-5 table-title">
+        Addresses
+        <font-awesome-icon
+          v-if="RcoParcelsStore.loadingOpaPropertiesPublic"
+          icon="fa-solid fa-spinner"
+          spin
+        />
+        <span v-else>({{ rcoParcelsLength }})</span>
+      </h2>
+      <div
+        v-if="addressesTableData.rows"
+        class="horizontal-table"
+      >
+      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && addressesTableData.rows && addressesTableData.rows.length > 0" -->
+        <vue-good-table
+          id="addresses"
+          :columns="addressesTableData.columns"
+          :rows="addressesTableData.rows"
+          :pagination-options="paginationOptions(addressesTableData.rows.length)"
+          style-class="table"
+        >
+          <template #emptystate>
+            <div v-if="RcoParcelsStore.loadingOpaPropertiesPublic">
+              Loading addresses... <font-awesome-icon
+                icon="fa-solid fa-spinner"
+                spin
+              />
+            </div>
+            <div v-else>
+              No addresses found for the selected building
+            </div>
+          </template>
+
+          <!-- <template #table-row="props">
+            <span v-if="props.column.label == 'Address'">
+              <span style="font-weight: bold; color: blue;">{{props.row.address_std}}</span> 
+            </span>
+            <span v-else>
+              {{props.formattedRow[props.column.field]}}
+            </span>
+          </template> -->
+
+          <template #pagination-top="props">
+            <custom-pagination-labels
+              :mode="'pages'"
+              :total="props.total"
+              :perPage="5"
+              @page-changed="props.pageChanged"
+              @per-page-changed="props.perPageChanged"
+            >
+            </custom-pagination-labels>
+          </template>
+        </vue-good-table>
+      </div>
+    </div>
+  </div>
 
 </template>
 

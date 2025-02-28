@@ -227,7 +227,7 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
       source: 'rcoParcels',
       layout: {},
       paint: {
-        'line-color': '#e6987c',
+        'line-color': '#444444',
         'line-width': 2,
       }
     },

@@ -307,7 +307,7 @@ watch(
 )
 
 watch(
-  () => RcoParcelsStore.rco,
+  () => RcoParcelsStore.rcoParcels,
   async newRcoParcels => {
     if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newRcoParcels:', newRcoParcels);
     if (newRcoParcels && map.getSource('rcoParcels')) {

@@ -21,10 +21,13 @@ const clearStoreData = async() => {
   const MainStore = useMainStore();
   MainStore.clearDataSourcesLoadedArray();
 
-  const OpaStore = useOpaStore();
-  OpaStore.clearAllOpaData();
-  const DorStore = useDorStore();
-  DorStore.clearAllDorData();
+  const RcoParcelsStore = useRcoParcelsStore();
+  RcoParcelsStore.clearAllRcoParcelsData();
+
+  // const OpaStore = useOpaStore();
+  // OpaStore.clearAllOpaData();
+  // const DorStore = useDorStore();
+  // DorStore.clearAllDorData();
 
   const CondosStore = useCondosStore();
   CondosStore.lastPageUsed = 1;
@@ -179,6 +182,7 @@ const dataFetch = async(to, from) => {
 
   // get neighboring parcels
   const RcoParcelsStore = useRcoParcelsStore();
+  await RcoParcelsStore.fillRcoDataByBuffer();
   await RcoParcelsStore.fillRcoParcelDataByBuffer();
   await RcoParcelsStore.fillOpaPropertiesPublic();
 
