@@ -192,7 +192,7 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
         }
       }
     },
-    rcoParcels: {
+    pwdParcels: {
       type: 'geojson',
       data: {
         type: 'FeatureCollection',
@@ -212,9 +212,9 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
       type: 'raster',
     },
     {
-      id: 'rcoParcels',
+      id: 'pwdParcels',
       type: 'fill',
-      source: 'rcoParcels',
+      source: 'pwdParcels',
       layout: {},
       paint: {
         'fill-color': '#e6987c',
@@ -222,9 +222,9 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
       },
     },
     {
-      id: 'rcoParcelsLine',
+      id: 'pwdParcelsLine',
       type: 'line',
-      source: 'rcoParcels',
+      source: 'pwdParcels',
       layout: {},
       paint: {
         'line-color': '#444444',

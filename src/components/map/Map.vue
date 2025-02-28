@@ -307,11 +307,11 @@ watch(
 )
 
 watch(
-  () => RcoParcelsStore.rcoParcels,
-  async newRcoParcels => {
-    if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newRcoParcels:', newRcoParcels);
-    if (newRcoParcels && map.getSource('rcoParcels')) {
-      map.getSource('rcoParcels').setData(newRcoParcels);
+  () => RcoParcelsStore.pwdParcels,
+  async newPwdParcels => {
+    if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newPwdParcels:', newPwdParcels);
+    if (newPwdParcels && map.getSource('pwdParcels')) {
+      map.getSource('pwdParcels').setData(newPwdParcels);
     }
   }
 )
