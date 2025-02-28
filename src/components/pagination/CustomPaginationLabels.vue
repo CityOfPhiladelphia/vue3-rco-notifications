@@ -89,7 +89,7 @@ import {
 } from './constants';
 
 export default {
-  name: 'VgtPagination',
+  name: 'CustomPaginationLabels',
 
   components: {
     'pagination-page-info': VgtPaginationPageInfo,
@@ -97,7 +97,7 @@ export default {
   props: {
     styleClass: { default: 'table table-bordered' },
     total: { default: null },
-    perPage: {},
+    perPage: null,
     rtl: { default: false },
     perPageDropdownEnabled: { default: true },
     customRowsPerPageDropdown: { default() { return []; } },
@@ -249,7 +249,7 @@ export default {
         }
       } else {
         // reset to default
-        this.currentPerPage = 10;
+        this.currentPerPage = 5;
       }
     },
   },
