@@ -119,7 +119,7 @@ export default {
       id: this.getId(),
       currentPage: 1,
       prevPage: 0,
-      currentPerPage: 10,
+      currentPerPage: null,
       rowsPerPageOptions: [],
     };
   },
@@ -219,6 +219,7 @@ export default {
       if (oldValue) {
         //* only emit if this isn't first initialization
         this.$emit('per-page-changed', { currentPerPage: this.currentPerPage });
+        this.$emit('per-page-changed-left-panel', { currentPerPage: this.currentPerPage });
       }
       this.changePage(1, false);
     },
@@ -247,6 +248,9 @@ export default {
         if (!found && this.perPage !== -1) {
           this.rowsPerPageOptions.unshift(this.perPage);
         }
+      } else if (this.currentPerPage) {
+        // if perPage is not set, but currentPerPage is, we set perPage to currentPerPage
+        this.perPage = this.currentPerPage;
       } else {
         // reset to default
         this.currentPerPage = 5;
