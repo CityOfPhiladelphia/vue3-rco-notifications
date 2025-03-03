@@ -9,7 +9,7 @@ const PAGINATION_MODES = {
   Pages: 'pages',
   Records: 'records',
 };
-const DEFAULT_ROWS_PER_PAGE_DROPDOWN = [10, 20, 30, 40, 50];
+const DEFAULT_ROWS_PER_PAGE_DROPDOWN = [5, 10, 20, 30, 40, 50];
 
 export {
   DEFAULT_SORT_TYPE,
