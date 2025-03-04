@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useMainStore } from '@/stores/MainStore.js'
 const GeocodeStore = useGeocodeStore();
 import { useGeocodeStore } from '@/stores/GeocodeStore.js'
@@ -130,6 +130,29 @@ const rcosTableData = computed(() => {
   }
 });
 
+const rcosTablePerPage = ref(5);
+
+const rcosPaginationOptions = computed(() => {
+  return {
+    enabled: rcosTableData.value.rows.length > 5,
+    mode: 'pages',
+    perPage: rcosTablePerPage.value,
+    position: 'top',
+    dropdownAllowAll: false,
+    nextLabel: '',
+    prevLabel: '',
+    rowsPerPageLabel: '# rows',
+    ofLabel: 'of',
+    pageLabel: 'page', // for 'pages' mode
+    allLabel: 'All',
+  }
+});
+
+const rcoPerPageChanged = (e) => {
+  console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
+  rcosTablePerPage.value = e.currentPerPage;
+};
+
 const propertiesTableData = computed(() => {
   return {
     columns: [
@@ -149,6 +172,29 @@ const propertiesTableData = computed(() => {
     rows: opaProperties.value || [],
   }
 });
+
+const propertiesTablePerPage = ref(5);
+
+const propertiesPaginationOptions = computed(() => {
+  return {
+    enabled: propertiesTableData.value.rows.length > 5,
+    mode: 'pages',
+    perPage: propertiesTablePerPage.value,
+    position: 'top',
+    dropdownAllowAll: false,
+    nextLabel: '',
+    prevLabel: '',
+    rowsPerPageLabel: '# rows',
+    ofLabel: 'of',
+    pageLabel: 'page', // for 'pages' mode
+    allLabel: 'All',
+  }
+});
+
+const propertiesPerPageChanged = (e) => {
+  console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
+  propertiesTablePerPage.value = e.currentPerPage;
+};
 
 const exportRcos = () => {
   let csvContent = 'data:text/csv;charset=utf-8,Organization Name, Primary Email, Organization Address, Primary Name, Primary Address, Primary Phone\n';
@@ -193,7 +239,7 @@ const exportProperties = () => {
   link.setAttribute('download', 'properties.csv');
   document.body.appendChild(link);
   link.click();
-}
+};
 
 </script>
 
@@ -230,7 +276,7 @@ const exportProperties = () => {
 
   <!-- IF AN ADDRESS IS LOADED, SHOW THE DATA  -->
   <div
-    v-if="route.name !== 'home' && route.name !== 'not-found' && address"
+    v-show="route.name !== 'home' && route.name !== 'not-found' && address"
     class="address-holder"
   >
     <div>
@@ -248,7 +294,7 @@ const exportProperties = () => {
   </div>
 
   <div
-    v-if="route.name !== 'home' && route.name !== 'not-found'"
+    v-show="route.name !== 'home' && route.name !== 'not-found'"
     id="topic-panel-content"
     class="topics"
   >
@@ -262,8 +308,8 @@ const exportProperties = () => {
         />
         <span v-else>({{ rcosLength }})</span>
       </h2>
+      <!-- v-show="rcosTableData.rows" -->
       <div
-        v-if="rcosTableData.rows"
         class="horizontal-table"
       >
       <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
@@ -271,7 +317,7 @@ const exportProperties = () => {
           id="properties"
           :columns="rcosTableData.columns"
           :rows="rcosTableData.rows"
-          :pagination-options="paginationOptions(rcosTableData.rows.length)"
+          :pagination-options="rcosPaginationOptions"
           style-class="table"
         >
           <template #emptystate>
@@ -288,7 +334,7 @@ const exportProperties = () => {
 
           <template #table-actions>
             <button
-              class="button is-small is-primary"
+              class="button is-small is-primary export-button"
               @click="exportRcos()"
             >
               Export RCOs
@@ -306,11 +352,13 @@ const exportProperties = () => {
 
           <template #pagination-top="props">
             <custom-pagination-labels
+              :test="function() { console.log('test, props:', props); }()"
               :mode="'pages'"
               :total="props.total"
-              :perPage="5"
+              :perPage="rcosTablePerPage"
               @page-changed="props.pageChanged"
               @per-page-changed="props.perPageChanged"
+              @per-page-changed-left-panel="rcoPerPageChanged"
             >
             </custom-pagination-labels>
           </template>
@@ -329,7 +377,7 @@ const exportProperties = () => {
         <span v-else>({{ opaPropertiesLength }})</span>
       </h2>
       <div
-        v-if="propertiesTableData.rows"
+        v-show="propertiesTableData.rows"
         class="horizontal-table"
       >
       <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
@@ -337,7 +385,7 @@ const exportProperties = () => {
           id="properties"
           :columns="propertiesTableData.columns"
           :rows="propertiesTableData.rows"
-          :pagination-options="paginationOptions(propertiesTableData.rows.length)"
+          :pagination-options="propertiesPaginationOptions"
           style-class="table"
         >
           <template #emptystate>
@@ -354,29 +402,21 @@ const exportProperties = () => {
 
           <template #table-actions>
             <button
-              class="button is-small is-primary"
+              class="button is-small is-primary export-button"
               @click="exportProperties()"
             >
               Export Properties
             </button>
           </template>
 
-          <!-- <template #table-row="props">
-            <span v-if="props.column.label == 'Address'">
-              <span style="font-weight: bold; color: blue;">{{props.row.address_std}}</span> 
-            </span>
-            <span v-else>
-              {{props.formattedRow[props.column.field]}}
-            </span>
-          </template> -->
-
           <template #pagination-top="props">
             <custom-pagination-labels
               :mode="'pages'"
               :total="props.total"
-              :perPage="5"
+              :perPage="propertiesTablePerPage"
               @page-changed="props.pageChanged"
               @per-page-changed="props.perPageChanged"
+              @per-page-changed-left-panel="propertiesPerPageChanged"
             >
             </custom-pagination-labels>
           </template>
@@ -392,6 +432,10 @@ const exportProperties = () => {
 .address-and-marker {
   margin-top: .5rem !important;
   margin-bottom: 0px !important;
+}
+
+.export-button {
+  margin-right: 1rem;
 }
 
 </style>
