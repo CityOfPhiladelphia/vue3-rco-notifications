@@ -23,8 +23,10 @@ import PhilaUICore from "@phila/phila-ui-core";
 import AppHeader from "@phila/phila-ui-app-header";
 import AppFooter from "@phila/phila-ui-app-footer";
 import Dropdown from "@phila/phila-ui-dropdown";
+import DropdownNav from "@phila/phila-ui-dropdown-nav";
 import MobileNav from "@phila/phila-ui-mobile-nav";
 import NavLink from "@phila/phila-ui-nav-link";
+import TabsNav from "@phila/phila-ui-tabs-nav";
 import Textbox from "@phila/phila-ui-textbox";
 import LangSelector from "@phila/phila-ui-lang-selector";
 
@@ -37,8 +39,10 @@ app.component("AppFooter", AppFooter);
 app.component("Dropdown", Dropdown);
 app.component("MobileNav", MobileNav);
 app.component("NavLink", NavLink);
+app.component("TabsNav", TabsNav);
 app.component("Textbox", Textbox);
 app.component("LangSelector", LangSelector);
+app.component("DropdownNav", DropdownNav);
 app.use(PhilaUICore);
 
 // import $config from './config'

@@ -133,6 +133,84 @@ const appTitle = computed(() => {
   return 'RCO Notifications for Zoning Applications';
 })
 
+const navLinks1 = {
+  button: "Instructions", //trigger
+  links: [
+    {
+      href: "//www.phila.gov/media/20230928121817/PCPC.RCO-Notice_-Instructions-for-Applicants-Appellants.pdf",
+      text: "Instructions for Applicants",
+      target: '_blank',
+    },
+    {
+      href: "//www.phila.gov/media/20230928121724/PCPC.RCO-Notice_-Instructions-for-RCOs.pdf",
+      text: "Instructions for RCOs",
+      target: '_blank',
+    },
+    {
+      href: "//www.phila.gov/media/20201210150923/PCPC.RCO_.APPLICANT-NOTIFICATION_TEMPLATES.pdf",
+      text: "Template for Applicants (.PDF)",
+      target: '_blank',
+    },
+    {
+      href: "//www.phila.gov/media/20201210150858/PCPC.RCO_.APPLICANT-NOTIFICATION_TEMPLATES.docx",
+      text: "Template for Applicants (.DOCX)",
+      target: '_blank',
+    },
+    {
+      href: "//www.phila.gov/media/20190816134749/Meeting_Summary_Template.pdf",
+      text: "Meeting Summary Form for RCOs",
+      target: '_blank',
+    }
+  ]
+}
+
+const navLinks2 = {
+  button: "Contact Lists", //trigger
+  links: [
+    {
+      href: "//www.phila.gov/media/20240813132724/PCPC-City-Council-RCO-Contacts-8.13.24.pdf",
+      text: "Council Contacts",
+      target: '_blank',
+    },
+    {
+      href: "//www.phila.gov/media/20240828084407/PCPC.Accepted-RCOs.8.28.24.pdf",
+      text: "List of RCOs",
+      target: '_blank',
+    },
+    {
+      href: "//openmaps.phila.gov/",
+      text: "Map of RCOs",
+      target: '_blank',
+    },
+  ]
+}
+
+const navLinks3 = {
+  button: "Legislation & Regulation", //trigger
+  links: [
+    {
+      href: "//codelibrary.amlegal.com/codes/philadelphia/latest/philadelphia_pa/0-0-0-288947",
+      text: "Philadelphia City Code (§ 14-303, Subsections (11A) and (12))",
+      target: '_blank',
+    },
+    {
+      href: "//www.phila.gov/media/20230317091911/March-2023-PCPC-Regulations.pdf",
+      text: "PCPC Regulations (Section 12)",
+      target: "_blank",
+    },
+    {
+      href: "//www.phila.gov/media/20190816135120/Applicant-Rights-and-Responsibilities.pdf",
+      text: "Applicant Rights and Responsibilities",
+      target: "_blank",
+    },
+    {
+      href: "//www.phila.gov/media/20190417143814/RCO-Rights-and-Responsibilities-5.pdf",
+      text: "RCO Rights and Responsibilities",
+      target: "_blank",
+    },
+  ]
+}
+
 </script>
 
 <template>
@@ -147,6 +225,17 @@ const appTitle = computed(() => {
     :is-sticky="true"
     :is-fluid="true"
   >
+
+    <!-- <template #tabs-nav>
+      <tabs-nav :links="links" />
+    </template> -->
+
+    <template #dropdown-nav>
+      <dropdown-nav :nav="navLinks1" />
+      <dropdown-nav :nav="navLinks2" />
+      <dropdown-nav :nav="navLinks3" />
+    </template>
+
     <template #mobile-nav>
       <mobile-nav :links="links" />
     </template>
@@ -180,7 +269,7 @@ const appTitle = computed(() => {
       v-if="isMobileDevice() || MainStore.windowDimensions.width <= 768"
       class="topics-holder"
     >
-      <topic-panel />
+      <left-panel />
     </div>
   </main>
 
