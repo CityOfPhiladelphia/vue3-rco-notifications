@@ -54,11 +54,17 @@ export const useMapStore = defineStore("MapStore", {
     },
     async fillBufferForParcel() {
       if (import.meta.env.VITE_DEBUG) console.log('fillBufferForParcel is running');
-      if (useParcelsStore().pwd.features.length > 0) {
+      const ParcelsStore = useParcelsStore();
+      if (ParcelsStore.pwd.features && ParcelsStore.pwd.features.length > 0) {
         let parcel = useParcelsStore().pwd.features[0];
         this.bufferForParcel= buffer(parcel, this.searchDistance, {units: 'feet'});
+      } else {
+        this.bufferForParcel = buffer(point(this.currentAddressCoords), this.searchDistance, {units: 'feet'});
       }
     },
+    async clearBufferForParcel() {
+      this.bufferForParcel = { type: 'FeatureCollection', features: [] };
+    }
   },
 });
 

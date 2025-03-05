@@ -15,6 +15,12 @@ export const useParcelsStore = defineStore('ParcelsStore', {
     };
   },
   actions: {
+    async clearParcels() {
+      this.pwdChecked = {};
+      this.pwd = {};
+      this.dorChecked = {};
+      this.dor = {};
+    },
     async fillPwdParcelData() {
       const GeocodeStore = useGeocodeStore();
       const AddressLoaded = GeocodeStore.aisData.features

@@ -226,10 +226,6 @@ const navLinks3 = {
     :is-fluid="true"
   >
 
-    <!-- <template #tabs-nav>
-      <tabs-nav :links="links" />
-    </template> -->
-
     <template #dropdown-nav>
       <dropdown-nav :nav="navLinks1" />
       <dropdown-nav :nav="navLinks2" />

@@ -21,6 +21,12 @@ const clearStoreData = async() => {
   const MainStore = useMainStore();
   MainStore.clearDataSourcesLoadedArray();
 
+  // const ParcelsStore = useParcelsStore();
+  // ParcelsStore.clearParcels();
+
+  const MapStore = useMapStore();
+  MapStore.clearBufferForParcel();
+
   const RcoParcelsStore = useRcoParcelsStore();
   RcoParcelsStore.clearAllPwdParcelsData();
 
@@ -36,13 +42,16 @@ const clearStoreData = async() => {
 
 const getGeocodeAndPutInStore = async(address) => {
   const GeocodeStore = useGeocodeStore();
+  const ParcelsStore = useParcelsStore();
   const MainStore = useMainStore();
   await GeocodeStore.fillAisData(address);
   if (MainStore.lastSearchMethod == 'address' && !GeocodeStore.aisData.features) {
     MainStore.currentAddress = null;
     if (import.meta.env.VITE_DEBUG == 'true') console.log('getGeocodeAndPutInStore, calling not-found');
+    ParcelsStore.clearParcels();
     return;
   } else if (!GeocodeStore.aisData.features) {
+    ParcelsStore.clearParcels();
     return;
   }
   let currentAddress;
@@ -162,6 +171,8 @@ const dataFetch = async(to, from) => {
     }
     if (import.meta.env.VITE_DEBUG == 'true') console.log('in datafetch, after geocode, GeocodeStore.aisData:', GeocodeStore.aisData);
 
+    await GeocodeStore.fillAisBlockData(address);
+
     // if this was NOT started by a map click, get the parcels
     if (MainStore.lastSearchMethod !== 'mapClick') {
       if (import.meta.env.VITE_DEBUG == 'true') console.log('dataFetch, inside if routeAddressChanged:', routeAddressChanged);
@@ -182,8 +193,10 @@ const dataFetch = async(to, from) => {
 
   // get neighboring parcels
   const RcoParcelsStore = useRcoParcelsStore();
-  await RcoParcelsStore.fillRcoDataByBuffer();
-  await RcoParcelsStore.fillRcoParcelDataByBuffer();
+  await RcoParcelsStore.fillRcoDataByParcelBounds();
+  await RcoParcelsStore.fillPwdParcelDataByBlock();
+  await RcoParcelsStore.fillPwdParcelDataByBuffer();
+  await RcoParcelsStore.mergePwdParcels();
   await RcoParcelsStore.fillOpaPropertiesPublic();
 
   MainStore.lastSearchMethod = null;

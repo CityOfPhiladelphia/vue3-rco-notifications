@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 import { useMainStore } from '@/stores/MainStore.js'
 import { useMapStore } from '@/stores/MapStore.js'
+import { useParcelsStore } from '@/stores/ParcelsStore.js'
 import axios from 'axios';
 
 import useTransforms from '@/composables/useTransforms';
@@ -12,8 +13,12 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     return {
       rcos: {},
       loadingRcos: false,
-      pwdParcels: {},
-      loadingPwdParcels: false,
+      pwdParcelsByBlock: {},
+      loadingPwdParcelsByBlock: false,
+      pwdParcelsByBuffer: {},
+      loadingPwdParcelsByBuffer: false,
+      pwdParcelsMerged: [],
+      loadingPwdParcelsMerged: false,
       opaPropertiesPublic: {},
       loadingOpaPropertiesPublic: false,
       units: {},
@@ -21,8 +26,12 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
   },
   actions: {
     async clearAllPwdParcelsData() {
-      // this.loadingPwdParcels = true;
-      // this.pwdParcels = {};
+      this.loadingPwdParcelsByBlock = true;
+      this.pwdParcelsByBlock = {};
+      this.loadingPwdParcelsByBuffer = true;
+      this.pwdParcelsByBuffer = {};
+      this.loadingPwdParcelsMerged = {};
+      this.pwdParcelsMerged = { type: 'FeatureCollection', features: [] };
       this.loadingRcos = true;
       this.rcos = {};
       this.loadingOpaPropertiesPublic = true;
@@ -66,14 +75,17 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     },
     async fillOpaPropertiesPublic() {
       try {
-        const opaSet = this.pwdParcels.features.map((feature) => feature.properties.PARCEL_ID).join("','");
+        // const opaSet = this.pwdParcelIdsMerged.join("','");
+        console.log('fillOpaPropertiesPublic is running');
+        const opaSet = this.pwdParcelsMerged.features.map((feature) => feature.properties.PARCEL_ID).join("','");
+        console.log('opaSet:', opaSet);
         const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+pwd_parcel_id+in+(%27${opaSet}%27)`);
         // const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+parcel_number+in+(%27${opaSet}%27)`);
         if (response.ok) {
           let data = await response.json();
-          console.log('data:', data);
+          // console.log('data:', data);
           data.rows.forEach(item => {
-            console.log('item:', item);
+            // console.log('item:', item);
             item.parcel_address = `${item.address_std}<br>PHILADELPHIA, PA ${item.zip_code}`;
 
             item.mail_contact = '';
@@ -94,22 +106,9 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         this.loadingOpaPropertiesPublic = false;
       }
     },
-    async fillRcoDataByBuffer() {
-      const MapStore = useMapStore();
-      const buffer = MapStore.bufferForParcel;
-      const xyCoords = buffer.geometry.coordinates[0];
-      let xyCoordsReduced = [[ parseFloat(xyCoords[0][0].toFixed(6)), parseFloat(xyCoords[0][1].toFixed(6)) ]];
-      var i;
-
-      for (i = 0; i < xyCoords.length; i++) {
-        if (i%3 == 0) {
-          let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
-          xyCoordsReduced.push(newXyCoordReduced);
-        }
-      }
-      xyCoordsReduced.push([ parseFloat(xyCoords[0][0].toFixed(6)), parseFloat(xyCoords[0][1].toFixed(6)) ]);
-
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillRcoDataByBuffer MapStore.bufferForParcel.geometry:', MapStore.bufferForParcel.geometry);
+    async fillRcoDataByParcelBounds() {
+      const GeocodeStore = useGeocodeStore();
+      const ParcelsStore = useParcelsStore();
       let params = {
         'where': '1=1',
         'outSR': 4326,
@@ -117,15 +116,43 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         'outFields': '*',
         'inSr': 4326,
         'returnGeometry': true,
-        'geometry': JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }}),
-        'geometryType': 'esriGeometryPolygon',
+        // 'geometry': JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }}),
+        // 'geometryType': 'esriGeometryPolygon',
         'spatialRel': 'esriSpatialRelIntersects',
       };
+      let xyCoords;
+      if (ParcelsStore.pwd.features && ParcelsStore.pwd.features.length > 0) {
+        xyCoords = ParcelsStore.pwd.features[0].geometry.coordinates[0];
+        params.geometry = JSON.stringify({ "rings": [xyCoords], "spatialReference": { "wkid": 4326 }});
+        params.geometryType = 'esriGeometryPolygon';
+      } else if (GeocodeStore.aisData.features && GeocodeStore.aisData.features.length > 0) {
+        xyCoords = [GeocodeStore.aisData.features[0].geometry.coordinates];
+        params.geometry = JSON.stringify({ "x": xyCoords[0][0], "y": xyCoords[0][1], "spatialReference": { "wkid": 4326 }});
+        params.geometryType = 'esriGeometryPoint';
+      }
+      let xyCoordsReduced = [];
+      for (let i = 0; i < xyCoords.length; i++) {
+        let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
+        xyCoordsReduced.push(newXyCoordReduced);
+      }
+
+      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
+      // let params = {
+      //   'where': '1=1',
+      //   'outSR': 4326,
+      //   'f': 'geojson',
+      //   'outFields': '*',
+      //   'inSr': 4326,
+      //   'returnGeometry': true,
+      //   'geometry': JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }}),
+      //   'geometryType': 'esriGeometryPolygon',
+      //   'spatialRel': 'esriSpatialRelIntersects',
+      // };
       const MainStore = useMainStore();
       try {
         const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/Zoning_RCO/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillRcoDataByBuffer - await resolved but HTTP status was not successful')
+          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillRcoDataByParcelBounds - await resolved but HTTP status was not successful')
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
@@ -143,27 +170,81 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           this.loadingRcos = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillRcoDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillRcoDataByParcelBounds await never resolved, failed to fetch pwd parcel data by lng/lat`)
         this.rcos = {};
         this.loadingRcos = false;
       }
     },
-    async fillRcoParcelDataByBuffer() {
+    async mergePwdParcels() {
+      let parcelsArray = [];
+      if (!this.pwdParcelsByBlock.features) {
+        parcelsArray = this.pwdParcelsByBuffer.features;
+      } else {
+        let parcelsSet = new Set([...this.pwdParcelsByBlock.features, ...this.pwdParcelsByBuffer.features]);
+        parcelsArray = [...parcelsSet];
+      }
+      console.log('parcelsArray:', parcelsArray);
+      if (parcelsArray.length > 0) {
+        this.pwdParcelsMerged = { type: 'FeatureCollection', features: parcelsArray };
+      } else {
+        this.pwdParcelsMerged = { type: 'FeatureCollection', features: [] };
+      }
+      this.loadingPwdParcelsMerged = false;
+    },
+    async fillPwdParcelDataByBlock() {
+      const GeocodeStore = useGeocodeStore();
+      const block = GeocodeStore.aisBlockData;
+      console.log('block:', block);
+      if (!block.features) return;
+      const blockPwd = block.features.filter((feature) => feature.properties.pwd_parcel_id);
+      const parcelIds = blockPwd.map((feature) => feature.properties.pwd_parcel_id).join("','");
+      let params = {
+        'where': `PARCEL_ID in ('${parcelIds}')`,
+        'outSR': 4326,
+        'f': 'geojson',
+        'outFields': '*',
+        'inSr': 4326,
+        'returnGeometry': true,
+      };
+      console.log('parcelIds:', parcelIds);
+      try {
+        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
+        if (response.status !== 200) {
+          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillPwdParcelDataByBlock - await resolved but HTTP status was not successful')
+        }
+        if (response.data.features.length > 0) {
+          let data = await response.data;
+          this.pwdParcelsByBlock = data;
+          this.loadingPwdParcelsByBlock = false;
+        } else {
+          if (import.meta.env.VITE_DEBUG == 'true') console.log('in else');
+          this.pwdParcelsByBlock = {};
+          this.loadingPwdParcelsByBlock = false;
+        }
+      } catch {
+        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillPwdParcelDataByBlock await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        this.pwdParcelsByBlock = {};
+        this.loadingPwdParcelsByBlock = false;
+      }
+    },
+    async fillPwdParcelDataByBuffer() {
       const MapStore = useMapStore();
       const buffer = MapStore.bufferForParcel;
       const xyCoords = buffer.geometry.coordinates[0];
-      let xyCoordsReduced = [[ parseFloat(xyCoords[0][0].toFixed(6)), parseFloat(xyCoords[0][1].toFixed(6)) ]];
-      var i;
+      // const xyCoordsReduced = xyCoords;
+      let xyCoordsReduced = [];
+      // let xyCoordsReduced = [[ parseFloat(xyCoords[0][0].toFixed(9)), parseFloat(xyCoords[0][1].toFixed(9)) ]];
+      // var i;
 
-      for (i = 0; i < xyCoords.length; i++) {
-        if (i%3 == 0) {
+      for (let i = 0; i < xyCoords.length; i++) {
+        // if (i%3 == 0) {
           let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
           xyCoordsReduced.push(newXyCoordReduced);
-        }
+        // }
       }
-      xyCoordsReduced.push([ parseFloat(xyCoords[0][0].toFixed(6)), parseFloat(xyCoords[0][1].toFixed(6)) ]);
+      // xyCoordsReduced.push([ parseFloat(xyCoords[0][0].toFixed(9)), parseFloat(xyCoords[0][1].toFixed(9)) ]);
 
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillRcoParcelDataByBuffer MapStore.bufferForParcel.geometry:', MapStore.bufferForParcel.geometry);
+      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillPwdParcelDataByBuffer MapStore.bufferForParcel.geometry:', MapStore.bufferForParcel.geometry);
       let params = {
         'where': '1=1',
         'outSR': 4326,
@@ -174,26 +255,27 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         'geometry': JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }}),
         'geometryType': 'esriGeometryPolygon',
         'spatialRel': 'esriSpatialRelIntersects',
+        // 'spatialRel': 'esriSpatialRelIntersects',
       };
       const MainStore = useMainStore();
       try {
         const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillRcoParcelDataByBuffer - await resolved but HTTP status was not successful')
+          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillPwdParcelDataByBuffer - await resolved but HTTP status was not successful')
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
-          this.pwdParcels = data;
-          this.loadingPwdParcels = false;
+          this.pwdParcelsByBuffer = data;
+          this.loadingPwdParcelsByBuffer = false;
         } else {
           if (import.meta.env.VITE_DEBUG == 'true') console.log('in else');
-          this.pwdParcels = {};
-          this.loadingPwdParcels = false;
+          this.pwdParcelsByBuffer = {};
+          this.loadingPwdParcelsByBuffer = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillRcoParcelDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
-        this.pwdParcels = {};
-        this.loadingPwdParcels = false;
+        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillPwdParcelDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        this.pwdParcelsByBuffer = {};
+        this.loadingPwdParcelsByBuffer = false;
       }
     },
   },

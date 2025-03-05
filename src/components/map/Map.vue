@@ -226,6 +226,9 @@ watch(
   if (newCoords.length) {
     const address = point(newCoords);
     map.getSource('addressMarker').setData(address);
+  } else {
+    const address = point([0,0]);
+    map.getSource('addressMarker').setData(address);
   }
 });
 
@@ -307,11 +310,14 @@ watch(
 )
 
 watch(
-  () => RcoParcelsStore.pwdParcels,
+  () => RcoParcelsStore.pwdParcelsMerged,
   async newPwdParcels => {
     if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newPwdParcels:', newPwdParcels);
     if (newPwdParcels && map.getSource('pwdParcels')) {
       map.getSource('pwdParcels').setData(newPwdParcels);
+      // map.getSource('pwdParcels').setData({ type: 'FeatureCollection', features: newPwdParcels});
+    } else {
+      map.getSource('pwdParcels').setData({ type: 'FeatureCollection', features: [] });
     }
   }
 )
