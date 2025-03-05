@@ -314,7 +314,7 @@ const exportProperties = () => {
       >
       <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
         <vue-good-table
-          id="properties"
+          id="rcos"
           :columns="rcosTableData.columns"
           :rows="rcosTableData.rows"
           :pagination-options="rcosPaginationOptions"
@@ -436,6 +436,38 @@ const exportProperties = () => {
 
 .export-button {
   margin-right: 1rem;
+}
+
+
+@media 
+only screen and (max-width: 768px),
+(min-device-width: 768px) and (max-device-width: 1024px) {
+
+  #rcos {
+    td:nth-of-type(2) {
+      min-height: 60px;
+    }
+    td:nth-of-type(4) {
+      min-height: 60px;
+    }
+
+    td:nth-of-type(1):before { content: "RCO"; }
+    td:nth-of-type(2):before { content: "Meeting Address"; }
+    td:nth-of-type(3):before { content: "Primary Contact"; }
+    td:nth-of-type(4):before { content: "Preferred Method"; }
+  }
+
+  #properties {
+    td:nth-of-type(2) {
+      min-height: 80px;
+    }
+
+    td:nth-of-type(1):before { content: "Property"; }
+    td:nth-of-type(2):before { content: "Contact Mailing Address"; }
+    /* td:nth-of-type(3):before { content: "Primary Contact"; }
+    td:nth-of-type(4):before { content: "Preferred Method"; } */
+  }
+
 }
 
 </style>
