@@ -23,7 +23,7 @@ import { useRouter, useRoute } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
-import { onMounted, onUpdated, computed, getCurrentInstance, watch } from 'vue';
+import { onMounted, computed, getCurrentInstance, watch } from 'vue';
 
 // COMPONENTS
 import LeftPanel from '@/components/LeftPanel.vue';
@@ -48,10 +48,6 @@ onMounted(async () => {
   main.scrollTop = -main.scrollHeight;
 
   window.addEventListener('resize', handleWindowResize);
-  handleWindowResize();
-});
-
-onUpdated(async () => {
   handleWindowResize();
 });
 
