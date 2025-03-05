@@ -31,8 +31,9 @@ a {
   height: calc(100vh - 50px);
   display: flex;
   flex-direction: row;
-  padding-top: 42px !important;
-  margin-top: 0px !important;
+  padding-top: 0px !important;
+  // padding-top: 42px !important;
+  // margin-top: 0px !important;
 }
 
 .topics-holder {
@@ -41,7 +42,7 @@ a {
   width: 50% !important;
   padding: 0;
   margin: 0;
-  height: calc(100vh - 110px);
+  height: calc(100vh - 118px);
 }
 
 .topics-holder-full {
@@ -297,7 +298,7 @@ only screen and (max-width: 768px),
   }
 
   .map-panel-holder {
-    padding-top: 28px !important;
+    // padding-top: 28px !important;
     width: 100%;
     flex-grow: 1;
     margin-bottom: 0px;

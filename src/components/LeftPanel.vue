@@ -464,8 +464,6 @@ only screen and (max-width: 768px),
 
     td:nth-of-type(1):before { content: "Property"; }
     td:nth-of-type(2):before { content: "Contact Mailing Address"; }
-    /* td:nth-of-type(3):before { content: "Primary Contact"; }
-    td:nth-of-type(4):before { content: "Preferred Method"; } */
   }
 
 }
