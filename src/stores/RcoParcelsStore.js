@@ -90,9 +90,14 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
 
             item.mail_contact = '';
             if (item.mailing_care_of) item.mail_contact +=`${item.mailing_care_of}<br>`;
-            if (item.mailing_address_1) item.mail_contact+=`${item.mailing_address_1}<br>`;
+            if (item.mailing_address_1 && isNaN(item.mailing_address_1)) item.mail_contact+=`${item.mailing_address_1}<br>`;
             if (item.mailing_address_2) item.mail_contact+=`${item.mailing_address_2}<br>`;
-            if (item.mailing_street) item.mail_contact += `${item.mailing_street}<br>`;
+            if (item.mailing_street) item.mail_contact += `${item.mailing_street}`;
+            if (item.mailing_address_1 && !isNaN(item.mailing_address_1)) {
+              item.mail_contact += ` #${item.mailing_address_1}<br>`
+            } else {
+              item.mail_contact += `<br>`;
+            }
             item.mail_contact += `${item.mailing_city_state} ${item.mailing_zip}`;//  ${phoneNumber(item.properties.PRIMARY_PHONE)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
           });
           this.opaPropertiesPublic = data;
