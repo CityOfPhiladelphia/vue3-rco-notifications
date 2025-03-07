@@ -116,8 +116,6 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         'outFields': '*',
         'inSr': 4326,
         'returnGeometry': true,
-        // 'geometry': JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }}),
-        // 'geometryType': 'esriGeometryPolygon',
         'spatialRel': 'esriSpatialRelIntersects',
       };
       let xyCoords;
@@ -137,17 +135,6 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       }
 
       if (import.meta.env.VITE_DEBUG == 'true') console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
-      // let params = {
-      //   'where': '1=1',
-      //   'outSR': 4326,
-      //   'f': 'geojson',
-      //   'outFields': '*',
-      //   'inSr': 4326,
-      //   'returnGeometry': true,
-      //   'geometry': JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }}),
-      //   'geometryType': 'esriGeometryPolygon',
-      //   'spatialRel': 'esriSpatialRelIntersects',
-      // };
       const MainStore = useMainStore();
       try {
         const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/Zoning_RCO/FeatureServer/0/query`, { params });
@@ -156,6 +143,16 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
+
+          data.features.sort((a, b) => {
+            if (a.properties.ORGANIZATION_NAME < b.properties.ORGANIZATION_NAME) {
+              return -1;
+            }
+            if (a.properties.ORGANIZATION_NAME > b.properties.ORGANIZATION_NAME) {
+              return 1;
+            }
+            return 0;
+          });
           // console.log('data:', data);
           data.features.forEach(item => {
             // console.log('item:', item);
