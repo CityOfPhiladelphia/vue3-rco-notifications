@@ -241,6 +241,13 @@ const exportProperties = () => {
   link.click();
 };
 
+const councilDistrict = computed(() => {
+  if (GeocodeStore.aisData && GeocodeStore.aisData.features) {
+    return GeocodeStore.aisData.features[0].properties.council_district;
+  }
+  return '';
+});
+
 </script>
 
 <template>
@@ -280,13 +287,13 @@ const exportProperties = () => {
     class="address-holder"
   >
     <div>
-      <h1 class="address-and-marker subtitle is-3">
-        <font-awesome-icon :icon="['fas', 'map-marker-alt']" /><div class="address">
-          {{ address }}
-        </div>
-      </h1>
+      <div class="subject">
+        SUBJECT: {{ address }}
+      </div>
+      <div>
+        COUNCIL DISTRICT: {{ councilDistrict }}
+      </div>
     </div>
-    <div>PHILADELPHIA, PA {{ zipCode }}</div>
 
     <div v-if="MainStore.fullScreenTopicsEnabled">
       <address-search-control :input-id="'address-bar-search-input'" />
@@ -300,7 +307,7 @@ const exportProperties = () => {
   >
     <div class="data-section">
       <h2 class="subtitle mb-3 is-5 table-title">
-        RCOs
+        Affected RCOs
         <font-awesome-icon
           v-if="RcoParcelsStore.loadingRcos"
           icon="fa-solid fa-spinner"
@@ -368,7 +375,7 @@ const exportProperties = () => {
 
     <div class="data-section">
       <h2 class="subtitle mb-3 is-5 table-title">
-        Properties
+        Properties to be notified
         <font-awesome-icon
           v-if="RcoParcelsStore.loadingOpaPropertiesPublic"
           icon="fa-solid fa-spinner"
@@ -429,9 +436,10 @@ const exportProperties = () => {
 
 <style>
 
-.address-and-marker {
-  margin-top: .5rem !important;
-  margin-bottom: 0px !important;
+.subject {
+  font-weight: bold;
+  font-size: 1.2rem;
+  /* margin-bottom: .25rem !important; */
 }
 
 .export-button {

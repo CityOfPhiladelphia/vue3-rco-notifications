@@ -29,6 +29,7 @@ export const useMainStore = defineStore("MainStore", {
       fullScreenMapEnabled: false,
       fullScreenTopicsEnabled: false,
       windowDimensions: {},
+      showDisclaimer: false,
     };
   },
 

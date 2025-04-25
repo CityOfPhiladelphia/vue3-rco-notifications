@@ -267,8 +267,13 @@ const router = createRouter({
 router.afterEach(async (to, from) => {
   if (import.meta.env.VITE_DEBUG == 'true') console.log('router afterEach to:', to, 'from:', from);
   const MainStore = useMainStore();
-  if (to.query.lang !== from.query.lang) {
-    MainStore.currentLang = to.query.lang;
+  // if (to.query.lang !== from.query.lang) {
+  //   MainStore.currentLang = to.query.lang;
+  // }
+  if (to.hash == '#disclaimer') {
+    MainStore.showDisclaimer = true;
+  } else {
+    MainStore.showDisclaimer = false;
   }
   if (to.name !== 'not-found' && to.name !== 'search' && to.name !== 'home') {
     MainStore.addressSearchRunning = false;

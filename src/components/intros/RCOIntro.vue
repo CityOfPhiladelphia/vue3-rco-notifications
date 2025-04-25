@@ -35,15 +35,8 @@ import AddressSearchControl from '@/components/AddressSearchControl.vue';
               through this process.</li>
           <li>Templates for documents that applicants and RCOs are to use throughout this process.</li>
         </ol>
-        <br><br>
-        To complete the notification process per
-        <a class="clickable"
-            href="https://codelibrary.amlegal.com/codes/philadelphia/latest/philadelphia_pa/0-0-0-205502#JD_14-303(11A)"
-            target="_blank">Section 14-303(12) of the Philadelphia Code</a>,
-        read the detailed instructions <a class="clickable"
-            href="https://www.phila.gov/media/20190816134122/Applicant_Detailed_Instructions.pdf"
-            target="_blank">here</a>, then click through to the map.
-        To see these instructions again, click the “info” icon at the top right of the search box.
+        <br>
+        <b>Type the property address of the proposed development in the search bar to see a list of affected RCOs and near neighbors.</b>
         <br /><br />
         For questions or comments, email <a class="clickable"
             href="mailto:RCO.Notification@phila.gov">RCO.Notification@phila.gov</a>.

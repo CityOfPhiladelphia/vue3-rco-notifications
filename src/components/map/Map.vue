@@ -315,11 +315,13 @@ watch(
     if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newPwdParcels:', newPwdParcels);
     if (newPwdParcels && map.getSource('pwdParcels')) {
       map.getSource('pwdParcels').setData(newPwdParcels);
-    } else {
+      const bounds = bbox(buffer(newPwdParcels, 300, {units: 'feet'}));
+      map.fitBounds(bounds);
+    } else if (map.getSource('pwdParcels')) {
       map.getSource('pwdParcels').setData({ type: 'FeatureCollection', features: [] });
     }
-    const bounds = bbox(buffer(newPwdParcels, 300, {units: 'feet'}));
-    map.fitBounds(bounds);
+    // const bounds = bbox(buffer(newPwdParcels, 300, {units: 'feet'}));
+    // map.fitBounds(bounds);
   }
 )
 

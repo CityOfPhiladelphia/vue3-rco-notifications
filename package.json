@@ -24,6 +24,7 @@
     "@phila/phila-ui-dropdown-nav": "^0.0.24",
     "@phila/phila-ui-lang-selector": "^0.0.7",
     "@phila/phila-ui-mobile-nav": "^0.0.6",
+    "@phila/phila-ui-modal": "0.0.16",
     "@phila/phila-ui-nav-link": "^0.0.6",
     "@phila/phila-ui-tabs-nav": "^0.0.22",
     "@phila/phila-ui-textbox": "^0.0.2",

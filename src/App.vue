@@ -28,6 +28,7 @@ import { onMounted, computed, getCurrentInstance, watch } from 'vue';
 // COMPONENTS
 import LeftPanel from '@/components/LeftPanel.vue';
 import MapPanel from '@/components/MapPanel.vue';
+import RCOIntro from '@/components/intros/RCOIntro.vue';
 
 const instance = getCurrentInstance();
 // if (import.meta.env.VITE_DEBUG == 'true') console.log('instance:', instance);
@@ -52,6 +53,11 @@ onMounted(async () => {
 });
 
 const footerLinks = [
+  {
+    type: 'native',
+    href: '#disclaimer',
+    text: 'Disclaimer',
+  },
   {
     type: 'native',
     href: 'https://phila.formstack.com/forms/atlas_feedback_form',
@@ -80,7 +86,9 @@ const handleWindowResize = () => {
   // console.log('rootHeightNum:', rootHeightNum, 'headerOffsetHeight:', headerOffsetHeight);
 
   let topicsHolder = document.querySelector("#topics-holder-widescreen");
-  topicsHolder.style.setProperty('height', `${rootHeightNum - headerOffsetHeight - 44}px`);
+  if (topicsHolder) {
+    topicsHolder.style.setProperty('height', `${rootHeightNum - headerOffsetHeight - 44}px`);
+  }
 }
 
 const fullScreenTopicsEnabled = computed(() => {
@@ -140,54 +148,24 @@ const appTitle = computed(() => {
 })
 
 const navLinks1 = {
-  button: "Instructions", //trigger
+  button: "Resources", //trigger
   links: [
     {
       type: 'native',
-      href: "https://www.phila.gov/media/20230928121817/PCPC.RCO-Notice_-Instructions-for-Applicants-Appellants.pdf",
-      text: "Instructions for Applicants",
+      href: "https://www.phila.gov/documents/registered-community-organization-rco-materials/",
+      text: "Instructions for Applicants & RCOs",
       target: '_blank',
     },
     {
       type: 'native',
-      href: "https://www.phila.gov/media/20230928121724/PCPC.RCO-Notice_-Instructions-for-RCOs.pdf",
-      text: "Instructions for RCOs",
+      href: "https://www.phila.gov/documents/registered-community-organization-rco-materials/",
+      text: "Templates",
       target: '_blank',
     },
     {
       type: 'native',
-      href: "https://www.phila.gov/media/20201210150923/PCPC.RCO_.APPLICANT-NOTIFICATION_TEMPLATES.pdf",
-      text: "Template for Applicants (.PDF)",
-      target: '_blank',
-    },
-    {
-      type: 'native',
-      href: "https://www.phila.gov/media/20201210150858/PCPC.RCO_.APPLICANT-NOTIFICATION_TEMPLATES.docx",
-      text: "Template for Applicants (.DOCX)",
-      target: '_blank',
-    },
-    {
-      type: 'native',
-      href: "https://www.phila.gov/media/20190816134749/Meeting_Summary_Template.pdf",
-      text: "Meeting Summary Form for RCOs",
-      target: '_blank',
-    }
-  ]
-}
-
-const navLinks2 = {
-  button: "Contact Lists", //trigger
-  links: [
-    {
-      type: 'native',
-      href: "https://www.phila.gov/media/20240813132724/PCPC-City-Council-RCO-Contacts-8.13.24.pdf",
-      text: "Council Contacts",
-      target: '_blank',
-    },
-    {
-      type: 'native',
-      href: "https://www.phila.gov/media/20240828084407/PCPC.Accepted-RCOs.8.28.24.pdf",
-      text: "List of RCOs",
+      href: "https://www.phila.gov/documents/registered-community-organization-rco-materials/",
+      text: "Council & RCO Contacts",
       target: '_blank',
     },
     {
@@ -199,8 +177,8 @@ const navLinks2 = {
   ]
 }
 
-const navLinks3 = {
-  button: "Legislation & Regulation", //trigger
+const navLinks2 = {
+  button: "RCO Rules & Regulations", //trigger
   links: [
     {
       type: 'native',
@@ -229,7 +207,11 @@ const navLinks3 = {
   ]
 }
 
-const mobileNavLinks = navLinks1.links.concat(navLinks2.links, navLinks3.links, footerLinks);
+const mobileNavLinks = navLinks1.links.concat(navLinks1.links, navLinks2.links, footerLinks);
+
+const closeModal = () => {
+  router.push({ path: route.path });
+};
 
 </script>
 
@@ -249,7 +231,6 @@ const mobileNavLinks = navLinks1.links.concat(navLinks2.links, navLinks3.links, 
     <template #dropdown-nav>
       <dropdown-nav :nav="navLinks1" />
       <dropdown-nav :nav="navLinks2" />
-      <dropdown-nav :nav="navLinks3" />
     </template>
 
     <template #mobile-nav>
@@ -263,6 +244,36 @@ const mobileNavLinks = navLinks1.links.concat(navLinks2.links, navLinks3.links, 
     id="main"
     class="main invisible-scrollbar"
   >
+
+    <div
+      v-show="MainStore.showDisclaimer"
+      class="modalWrapper"
+      @click="closeModal"
+    >
+      <modal
+        type="none"
+        :hide-close-button="true"
+        :close="closeModal"
+      >
+        <template #title>
+          Disclaimer
+        </template>
+        <slot>
+          <div class="content">
+            <RCOIntro />
+          </div>
+        </slot>
+        <template #actions-before>
+          <button
+            class="button is-secondary"
+            @click="closeModal"
+          >
+            Close
+          </button>
+        </template>
+      </modal>
+    </div>
+
     <!-- TOPIC PANEL ON LEFT -->
     <div
       v-if="!MainStore.isMobileDevice && MainStore.windowDimensions.width > 768 && !fullScreenMapEnabled"
@@ -301,6 +312,17 @@ const mobileNavLinks = navLinks1.links.concat(navLinks2.links, navLinks3.links, 
 
 <style>
 
-
+.modalWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
 </style>
