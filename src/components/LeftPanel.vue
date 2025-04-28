@@ -327,9 +327,9 @@ watch(
       <div>
         COUNCIL DISTRICT: {{ councilDistrict }}
       </div>
-      <div>
+      <!-- <div>
         RCO: {{ rcoNames }}
-      </div>
+      </div> -->
     </div>
 
     <div v-if="MainStore.fullScreenTopicsEnabled">

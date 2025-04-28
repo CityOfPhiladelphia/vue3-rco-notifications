@@ -16,6 +16,22 @@ import AddressSearchControl from '@/components/AddressSearchControl.vue';
     </div>
     <div :class="MainStore.fullScreenTopicsEnabled ? 'topic-panel-half': ''">
       <div>
+        For questions or comments, contact the Philadelphia Planning & Development Department:
+        <ul class="bullet-list">
+          <li>
+            <a
+              class="clickable"
+              href="tel:215-683-4615"
+            >(215) 683-4615</a>
+          </li>
+          <li>
+            <a
+              class="clickable"
+              href="mailto:RCO.Notification@phila.gov"
+            >RCO.Notification@phila.gov</a>
+          </li>
+        </ul>
+        <br>
         The Philadelphia Zoning Code includes provisions to ensure that neighbors of proposed developments
         are notified and have an opportunity to provide input regarding zoning decisions that may impact
         them. This is accomplished through a system of notification and through notification to near
@@ -37,9 +53,6 @@ import AddressSearchControl from '@/components/AddressSearchControl.vue';
         </ol>
         <br>
         <b>Type the property address of the proposed development in the search bar to see a list of affected RCOs and near neighbors.</b>
-        <br /><br />
-        For questions or comments, email <a class="clickable"
-            href="mailto:RCO.Notification@phila.gov">RCO.Notification@phila.gov</a>.
       </div>
     </div>
   </div>
