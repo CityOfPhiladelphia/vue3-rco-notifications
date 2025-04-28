@@ -326,31 +326,31 @@ watch(
 )
 
 // for Nearby topic, watch the clicked row to fly to its coordinates and show a popup
-const clickedRow = computed(() => { return MainStore.clickedRow; })
-watch(
-  () => clickedRow.value,
-  newClickedRow => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue clickedRow watch, newClickedRow:', newClickedRow, 'newClickedRow.type:', newClickedRow.type);
-    if (newClickedRow) map.flyTo({ center: newClickedRow.lngLat });
-    let idField, infoField, row;
+// const clickedRow = computed(() => { return MainStore.clickedRow; })
+// watch(
+//   () => clickedRow.value,
+//   newClickedRow => {
+//     if (import.meta.env.VITE_DEBUG == 'true') console.log('Map.vue clickedRow watch, newClickedRow:', newClickedRow, 'newClickedRow.type:', newClickedRow.type);
+//     if (newClickedRow) map.flyTo({ center: newClickedRow.lngLat });
+//     let idField, infoField, row;
     
-    idField = NearbyActivityStore.dataFields[newClickedRow.type].id_field;
-    infoField = NearbyActivityStore.dataFields[newClickedRow.type].info_field;
-    row = NearbyActivityStore[newClickedRow.type].rows.filter(row => row[idField] === newClickedRow.id)[0];
+//     idField = NearbyActivityStore.dataFields[newClickedRow.type].id_field;
+//     infoField = NearbyActivityStore.dataFields[newClickedRow.type].info_field;
+//     row = NearbyActivityStore[newClickedRow.type].rows.filter(row => row[idField] === newClickedRow.id)[0];
 
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('nearby click, newClickedRow:', newClickedRow, 'idField:', idField, 'row:', row);
-    if (row.properties) row[infoField] = row.properties[infoField];
-    const popup = document.getElementsByClassName('maplibregl-popup');
-    if (popup.length) {
-      popup[0].remove();
-    }
-    new maplibregl.Popup({ className: 'my-class' })
-      .setLngLat(newClickedRow.lngLat)
-      .setHTML(row[infoField] || row.properties[infoField])
-      .setMaxWidth("300px")
-      .addTo(map);
-  }
-);
+//     if (import.meta.env.VITE_DEBUG == 'true') console.log('nearby click, newClickedRow:', newClickedRow, 'idField:', idField, 'row:', row);
+//     if (row.properties) row[infoField] = row.properties[infoField];
+//     const popup = document.getElementsByClassName('maplibregl-popup');
+//     if (popup.length) {
+//       popup[0].remove();
+//     }
+//     new maplibregl.Popup({ className: 'my-class' })
+//       .setLngLat(newClickedRow.lngLat)
+//       .setHTML(row[infoField] || row.properties[infoField])
+//       .setMaxWidth("300px")
+//       .addTo(map);
+//   }
+// );
 
 // for Nearby topic, watch the id of the circle marker that is hovered on to change the color of the circle
 const hoveredStateId = computed(() => { return MainStore.hoveredStateId; })

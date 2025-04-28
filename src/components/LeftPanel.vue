@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/stores/MainStore.js'
 const GeocodeStore = useGeocodeStore();
 import { useGeocodeStore } from '@/stores/GeocodeStore.js'
@@ -18,6 +18,19 @@ import AddressSearchControl from '@/components/AddressSearchControl.vue';
 import RCOIntro from '@/components/intros/RCOIntro.vue';
 
 import { useRoute } from 'vue-router';
+
+import useScrolling from '@/composables/useScrolling';
+const { handleRowClick } = useScrolling();
+
+import * as bulmaToast from 'bulma-toast'
+
+bulmaToast.setDefaults({
+  position: 'top-center',
+  type: 'is-success',
+  dismissible: true,
+  closeOnClick: true,
+  zIndex: 9999,
+});
 
 const version = import.meta.env.VITE_VERSION;
 
@@ -253,6 +266,22 @@ const councilDistrict = computed(() => {
   return '';
 });
 
+const clickedRow = computed(() => {
+  return MainStore.clickedRow;
+})
+
+watch(
+  () => clickedRow.value,
+  (newClickedRow) => {
+    if (import.meta.env.VITE_DEBUG) console.log('watch clickedRow.value, newClickedRow:', newClickedRow);
+    navigator.clipboard.writeText(newClickedRow.id);
+    bulmaToast.toast({
+    message: `copied "${newClickedRow.id}" to clipboard`,
+    type: 'is-success',
+  })
+  }
+)
+
 </script>
 
 <template>
@@ -333,7 +362,8 @@ const councilDistrict = computed(() => {
           :columns="rcosTableData.columns"
           :rows="rcosTableData.rows"
           :pagination-options="rcosPaginationOptions"
-          style-class="table"
+          style-class="table nearby-table"
+          @row-click="handleRowClick($event, 'ORGANIZATION_NAME', 'RCO')"
         >
           <template #emptystate>
             <div v-if="RcoParcelsStore.loadingRcos">
