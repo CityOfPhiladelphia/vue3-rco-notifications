@@ -55,8 +55,8 @@ onMounted(async () => {
 const footerLinks = [
   {
     type: 'native',
-    href: '#disclaimer',
-    text: 'Disclaimer',
+    href: '#information',
+    text: 'Information',
   },
   {
     type: 'native',
@@ -246,7 +246,7 @@ const closeModal = () => {
   >
 
     <div
-      v-show="MainStore.showDisclaimer"
+      v-show="MainStore.showInformation"
       class="modalWrapper"
       @click="closeModal"
     >
@@ -256,7 +256,7 @@ const closeModal = () => {
         :close="closeModal"
       >
         <template #title>
-          Disclaimer
+          Information
         </template>
         <slot>
           <div class="content">

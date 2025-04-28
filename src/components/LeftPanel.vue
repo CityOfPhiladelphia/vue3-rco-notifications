@@ -45,7 +45,12 @@ const rcosCompareFn = (a, b) => {
 };
 const rcos = computed(() => { if (RcoParcelsStore.rcos.features) return [ ...RcoParcelsStore.rcos.features ].sort(rcosCompareFn) });
 const rcosLength = computed(() => rcos.value && rcos.value.length ? rcos.value.length : 0);
-
+const rcoNames = computed(() => {
+  if (rcos.value && rcos.value.length) {
+    return rcos.value.map(item => item.properties.ORGANIZATION_NAME).join(', ');
+  }
+  return '';
+});
 
 // RCO PARCELS
 const rcoParcelsCompareFn = (a, b) => {
@@ -243,7 +248,7 @@ const exportProperties = () => {
 
 const councilDistrict = computed(() => {
   if (GeocodeStore.aisData && GeocodeStore.aisData.features) {
-    return GeocodeStore.aisData.features[0].properties.council_district;
+    return GeocodeStore.aisData.features[0].properties.council_district_2024;
   }
   return '';
 });
@@ -292,6 +297,9 @@ const councilDistrict = computed(() => {
       </div>
       <div>
         COUNCIL DISTRICT: {{ councilDistrict }}
+      </div>
+      <div>
+        RCO: {{ rcoNames }}
       </div>
     </div>
 

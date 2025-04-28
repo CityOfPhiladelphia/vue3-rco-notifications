@@ -270,10 +270,10 @@ router.afterEach(async (to, from) => {
   // if (to.query.lang !== from.query.lang) {
   //   MainStore.currentLang = to.query.lang;
   // }
-  if (to.hash == '#disclaimer') {
-    MainStore.showDisclaimer = true;
+  if (to.hash == '#information') {
+    MainStore.showInformation = true;
   } else {
-    MainStore.showDisclaimer = false;
+    MainStore.showInformation = false;
   }
   if (to.name !== 'not-found' && to.name !== 'search' && to.name !== 'home') {
     MainStore.addressSearchRunning = false;
