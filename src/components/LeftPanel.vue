@@ -9,8 +9,6 @@ import { useRcoParcelsStore } from '@/stores/RcoParcelsStore.js'
 const RcoParcelsStore = useRcoParcelsStore();
 
 import CustomPaginationLabels from '@/components/pagination/CustomPaginationLabels.vue';
-import useTables from '@/composables/useTables';
-const { paginationOptions } = useTables();
 
 import FullScreenTopicsToggleTab from '@/components/FullScreenTopicsToggleTab.vue';
 import AddressSearchControl from '@/components/AddressSearchControl.vue';
@@ -32,19 +30,9 @@ bulmaToast.setDefaults({
   zIndex: 9999,
 });
 
-const version = import.meta.env.VITE_VERSION;
-
 const route = useRoute();
 
 const address = computed(() => MainStore.currentAddress);
-const dataSourcesLoadedArray = computed(() => MainStore.dataSourcesLoadedArray);
-
-const zipCode = computed(() => {
-  if (GeocodeStore.aisData && GeocodeStore.aisData.features) {
-    return GeocodeStore.aisData.features[0].properties.zip_code + '-' + GeocodeStore.aisData.features[0].properties.zip_4;
-  }
-  return '';
-});
 
 // RCOs
 const rcosCompareFn = (a, b) => {
@@ -78,67 +66,17 @@ const rcoParcelsCompareFn = (a, b) => {
 const opaProperties = computed(() => { if (RcoParcelsStore.opaPropertiesPublic.rows) return [ ...RcoParcelsStore.opaPropertiesPublic.rows ].sort(rcoParcelsCompareFn) });
 const opaPropertiesLength = computed(() => opaProperties.value && opaProperties.value.length ? opaProperties.value.length : 0);
 
-// const rcosTableData = computed(() => {
-//   return {
-//     columns: [
-//       {
-//         label: 'Organization Name',
-//         field: 'properties.ORGANIZATION_NAME',
-//         filterable: true,
-//         sortable: true,
-//       },
-//       {
-//         label: 'Email',
-//         field: 'properties.PRIMARY_EMAIL',
-//         filterable: true,
-//         sortable: true,
-//       },
-//       {
-//         label: 'Address',
-//         field: 'properties.ORGANIZATION_ADDRESS',
-//         filterable: true,
-//         sortable: true,
-//       },
-//       {
-//         label: 'Organization Name',
-//         field: 'properties.PRIMARY_NAME',
-//         filterable: true,
-//         sortable: true,
-//       },
-//       {
-//         label: 'Address',
-//         field: 'properties.PRIMARY_ADDRESS',
-//         filterable: true,
-//         sortable: true,
-//       },
-//       {
-//         label: 'Phone',
-//         field: 'properties.PRIMARY_PHONE',
-//         filterable: true,
-//         sortable: true,
-//       },
-//     ],
-//     rows: rcos.value,
-//   }
-// });
-
 const rcosTableData = computed(() => {
   return {
     columns: [
       {
         label: 'RCO',
-        field: 'properties.ORGANIZATION_NAME',
-        // field: 'properties.rco',
+        field: 'properties.rco',
         html: true,
-      },
-      {
-        label: 'RCO Address',
-        field: 'properties.ORGANIZATION_ADDRESS',
       },
       {
         label: 'Meeting Address',
-        field: 'properties.meeting_address',
-        html: true,
+        field: 'properties.MEETING_LOCATION_ADDRESS',
       },
       {
         label: 'Primary Contact',
@@ -173,11 +111,6 @@ const rcosPaginationOptions = computed(() => {
   }
 });
 
-const rcoPerPageChanged = (e) => {
-  if (import.meta.env.VITE_DEBUG) console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
-  rcosTablePerPage.value = e.currentPerPage;
-};
-
 const propertiesTableData = computed(() => {
   return {
     columns: [
@@ -185,14 +118,7 @@ const propertiesTableData = computed(() => {
         label: 'Property',
         field: 'parcel_address',
         html: true,
-        // filterable: true,
-        // sortable: true,
       },
-      // {
-      //   label: 'Contact Mailing Address',
-      //   field: 'mail_contact',
-      //   html: true,
-      // },
     ],
     rows: opaProperties.value || [],
   }
@@ -219,6 +145,15 @@ const propertiesPaginationOptions = computed(() => {
 const propertiesPerPageChanged = (e) => {
   if (import.meta.env.VITE_DEBUG) console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
   propertiesTablePerPage.value = e.currentPerPage;
+};
+
+const copyRcos = () => {
+  if (import.meta.env.VITE_DEBUG) console.log('copyRcos is running, rcoNames:', rcoNames.value);
+  navigator.clipboard.writeText(rcoNames.value);
+  bulmaToast.toast({
+    message: `copied all RCO names to clipboard`,
+    type: 'is-success',
+  })
 };
 
 const exportRcos = () => {
@@ -334,9 +269,6 @@ watch(
       <div>
         COUNCIL DISTRICT: {{ councilDistrict }}
       </div>
-      <!-- <div>
-        RCO: {{ rcoNames }}
-      </div> -->
     </div>
 
     <div v-if="MainStore.fullScreenTopicsEnabled">
@@ -359,11 +291,9 @@ watch(
         />
         <span v-else>({{ rcosLength }})</span>
       </h2>
-      <!-- v-show="rcosTableData.rows" -->
       <div
         class="horizontal-table"
       >
-      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
         <vue-good-table
           id="rcos"
           :columns="rcosTableData.columns"
@@ -386,6 +316,12 @@ watch(
 
           <template #table-actions>
             <button
+              class="button is-small is-primary copy-button"
+              @click="copyRcos()"
+            >
+              Copy RCO Names
+            </button>
+            <button
               class="button is-small is-primary export-button"
               @click="exportRcos()"
             >
@@ -394,26 +330,11 @@ watch(
           </template>
 
           <template #table-row="props">
-            <span v-if="props.column.label == 'RCO'">
-              <span style="font-weight: bold;">{{props.row.properties.ORGANIZATION_NAME}}</span> 
-            </span>
-            <span v-else-if="props.column.label == 'Meeting Address'">
-              <div style="width: 150px; word-break: break-word" v-html="props.row.properties.meeting_address"></div> 
+            <span v-if="props.column.label == 'Meeting Address'">
+              <div style="word-break: break-word" v-html="props.row.properties.meeting_address"></div> 
             </span>
           </template>
 
-          <!-- <template #pagination-top="props">
-            <custom-pagination-labels
-              :test="function() { console.log('test, props:', props); }()"
-              :mode="'pages'"
-              :total="props.total"
-              :perPage="rcosTablePerPage"
-              @page-changed="props.pageChanged"
-              @per-page-changed="props.perPageChanged"
-              @per-page-changed-left-panel="rcoPerPageChanged"
-            >
-            </custom-pagination-labels>
-          </template> -->
         </vue-good-table>
       </div>
     </div>
@@ -428,57 +349,51 @@ watch(
         />
         <span v-else>({{ opaPropertiesLength }})</span>
       </h2>
-      <!-- <div
-        v-show="propertiesTableData.rows"
-        class="horizontal-table"
-      > -->
-      <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
-        <vue-good-table
-          id="properties"
-          :columns="propertiesTableData.columns"
-          :rows="propertiesTableData.rows"
-          :row-style-class="row => hoveredStateId === row.pwd_parcel_id ? 'active-hover ' + row.pwd_parcel_id : 'inactive ' + row.pwd_parcel_id"
-          :pagination-options="propertiesPaginationOptions"
-          style-class="table"
-          @row-mouseenter="handleRowMouseover($event, 'pwd_parcel_id')"
-          @row-mouseleave="handleRowMouseleave"
-          @row-click="handleParcelRowClick($event, 'pwd_parcel_id', 'pwdParcel')"
-        >
-          <template #emptystate>
-            <div v-if="RcoParcelsStore.loadingOpaPropertiesPublic">
-              Loading properties... <font-awesome-icon
-                icon="fa-solid fa-spinner"
-                spin
-              />
-            </div>
-            <div v-else>
-              No properties found for the selected building
-            </div>
-          </template>
+      <vue-good-table
+        id="properties"
+        :columns="propertiesTableData.columns"
+        :rows="propertiesTableData.rows"
+        :row-style-class="row => hoveredStateId === row.pwd_parcel_id ? 'active-hover ' + row.pwd_parcel_id : 'inactive ' + row.pwd_parcel_id"
+        :pagination-options="propertiesPaginationOptions"
+        style-class="table"
+        @row-mouseenter="handleRowMouseover($event, 'pwd_parcel_id')"
+        @row-mouseleave="handleRowMouseleave"
+        @row-click="handleParcelRowClick($event, 'pwd_parcel_id', 'pwdParcel')"
+      >
+        <template #emptystate>
+          <div v-if="RcoParcelsStore.loadingOpaPropertiesPublic">
+            Loading properties... <font-awesome-icon
+              icon="fa-solid fa-spinner"
+              spin
+            />
+          </div>
+          <div v-else>
+            No properties found for the selected building
+          </div>
+        </template>
 
-          <template #table-actions>
-            <button
-              class="button is-small is-primary export-button"
-              @click="exportProperties()"
-            >
-              Export Properties
-            </button>
-          </template>
+        <template #table-actions>
+          <button
+            class="button is-small is-primary export-button"
+            @click="exportProperties()"
+          >
+            Export Properties
+          </button>
+        </template>
 
-          <template #pagination-top="props">
-            <custom-pagination-labels
-              :mode="'pages'"
-              :total="props.total"
-              :perPage="propertiesTablePerPage"
-              @page-changed="props.pageChanged"
-              @per-page-changed="props.perPageChanged"
-              @per-page-changed-left-panel="propertiesPerPageChanged"
-            >
-            </custom-pagination-labels>
-          </template>
-        </vue-good-table>
-      </div>
-    <!-- </div> -->
+        <template #pagination-top="props">
+          <custom-pagination-labels
+            :mode="'pages'"
+            :total="props.total"
+            :perPage="propertiesTablePerPage"
+            @page-changed="props.pageChanged"
+            @per-page-changed="props.perPageChanged"
+            @per-page-changed-left-panel="propertiesPerPageChanged"
+          >
+          </custom-pagination-labels>
+        </template>
+      </vue-good-table>
+    </div>
   </div>
 
 </template>
@@ -491,7 +406,7 @@ watch(
   /* margin-bottom: .25rem !important; */
 }
 
-.export-button {
+.export-button, .copy-button {
   margin-right: 1rem;
 }
 
