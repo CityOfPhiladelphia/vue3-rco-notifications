@@ -16,7 +16,7 @@ defineProps({
 });
 
 const clearAddress = () => {
-  if (import.meta.env.VITE_DEBUG == 'true') console.log('clearAddress is running');
+  if (import.meta.env.VITE_DEBUG) console.log('clearAddress is running');
   MainStore.addressSearchValue = '';
 }
 

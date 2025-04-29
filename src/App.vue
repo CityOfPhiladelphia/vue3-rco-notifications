@@ -1,5 +1,5 @@
 <script setup>
-if (import.meta.env.VITE_DEBUG == 'true') console.log('App.vue setup is running in debug mode');
+if (import.meta.env.VITE_DEBUG) console.log('App.vue setup is running in debug mode');
 
 import isMobileDevice from './util/is-mobile-device';
 import isMac from './util/is-mac'; // this can probably be removed from App.vue, and only run in main.js
@@ -16,7 +16,7 @@ if (!import.meta.env.VITE_PUBLICPATH) {
 } else {
   MainStore.publicPath = import.meta.env.VITE_PUBLICPATH;
 }
-if (import.meta.env.VITE_DEBUG == 'true') console.log('import.meta.env.VITE_PUBLICPATH:', import.meta.env.VITE_PUBLICPATH, 'MainStore.publicPath:', MainStore.publicPath);
+if (import.meta.env.VITE_DEBUG) console.log('import.meta.env.VITE_PUBLICPATH:', import.meta.env.VITE_PUBLICPATH, 'MainStore.publicPath:', MainStore.publicPath);
 
 // ROUTER
 import { useRouter, useRoute } from 'vue-router';
@@ -31,16 +31,16 @@ import MapPanel from '@/components/MapPanel.vue';
 import RCOIntro from '@/components/intros/RCOIntro.vue';
 
 const instance = getCurrentInstance();
-// if (import.meta.env.VITE_DEBUG == 'true') console.log('instance:', instance);
+// if (import.meta.env.VITE_DEBUG) console.log('instance:', instance);
 const locale = computed(() => instance.appContext.config.globalProperties.$i18n.locale);
-// if (import.meta.env.VITE_DEBUG == 'true') console.log('locale:', locale);
+// if (import.meta.env.VITE_DEBUG) console.log('locale:', locale);
 
 onMounted(async () => {
   // MainStore.appVersion = import.meta.env.VITE_VERSION;
   MainStore.isMobileDevice = isMobileDevice();
   MainStore.isMac = isMac();
   await router.isReady()
-  if (import.meta.env.VITE_DEBUG == 'true') console.log('App onMounted, route.params.address:', route.params.address);
+  if (import.meta.env.VITE_DEBUG) console.log('App onMounted, route.params.address:', route.params.address);
   if (route.name === 'not-found') {
     router.push({ name: 'home' });
   }
@@ -67,7 +67,7 @@ const footerLinks = [
 ];
 
 const handleWindowResize = () => {
-  console.log('handleWindowResize');
+  if (import.meta.env.VITE_DEBUG) console.log('handleWindowResize');
   const rootElement = document.getElementById('app');
   const rootStyle = window.getComputedStyle(rootElement);
   const rootWidth = rootStyle.getPropertyValue('width');
@@ -83,7 +83,7 @@ const handleWindowResize = () => {
 
   let header = document.querySelector("#app-header");
   let headerOffsetHeight = header.offsetHeight;
-  // console.log('rootHeightNum:', rootHeightNum, 'headerOffsetHeight:', headerOffsetHeight);
+  // if (import.meta.env.VITE_DEBUG) console.log('rootHeightNum:', rootHeightNum, 'headerOffsetHeight:', headerOffsetHeight);
 
   let topicsHolder = document.querySelector("#topics-holder-widescreen");
   if (topicsHolder) {
@@ -102,13 +102,13 @@ const fullScreenMapEnabled = computed(() => {
 watch(
   () => MainStore.currentLang,
   (newLang, oldLang) => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('watch MainStore.currentLang:', newLang, oldLang, 'locale.value:', locale.value);
+    if (import.meta.env.VITE_DEBUG) console.log('watch MainStore.currentLang:', newLang, oldLang, 'locale.value:', locale.value);
     if (newLang != locale.value) {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('setting locale:', newLang);
+      if (import.meta.env.VITE_DEBUG) console.log('setting locale:', newLang);
       // const instance = getCurrentInstance();
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('instance:', instance);
+      if (import.meta.env.VITE_DEBUG) console.log('instance:', instance);
       if (instance) {
-        if (import.meta.env.VITE_DEBUG == 'true') console.log('instance:', instance);
+        if (import.meta.env.VITE_DEBUG) console.log('instance:', instance);
         if (newLang) {
           instance.appContext.config.globalProperties.$i18n.locale = newLang;
         } else {
@@ -122,7 +122,7 @@ watch(
 watch(
   () => locale.value,
   (newLocale, oldLocale) => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('watch locale:', newLocale, oldLocale);
+    if (import.meta.env.VITE_DEBUG) console.log('watch locale:', newLocale, oldLocale);
     let startQuery = { ...route.query };
     if (newLocale === MainStore.currentLang) {
       return;

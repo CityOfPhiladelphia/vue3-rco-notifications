@@ -5,7 +5,7 @@ import area from '@turf/area';
 export default function useParcels() {
 
   const processParcels = async(featureCollection) => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('featureCollection:', featureCollection, 'featureCollection.features.length:', featureCollection.features.length);
+    if (import.meta.env.VITE_DEBUG) console.log('featureCollection:', featureCollection, 'featureCollection.features.length:', featureCollection.features.length);
     if (!featureCollection || featureCollection.features.length === 0) {
       return;
     }
@@ -13,9 +13,9 @@ export default function useParcels() {
     const featuresSorted = sortDorParcelFeatures(features);
 
     // use turf to get area and perimeter of all parcels returned
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('featuresSorted:', featuresSorted);
+    if (import.meta.env.VITE_DEBUG) console.log('featuresSorted:', featuresSorted);
     for (let featureSorted of featuresSorted) {
-      // if (import.meta.env.VITE_DEBUG == 'true') console.log('featureSorted:', featureSorted);
+      // if (import.meta.env.VITE_DEBUG) console.log('featureSorted:', featureSorted);
       const geometry = calculateAreaAndPerimeter(featureSorted);
       featureSorted.properties.TURF_PERIMETER = geometry.perimeter;
       featureSorted.properties.TURF_AREA = geometry.area;
@@ -28,7 +28,7 @@ export default function useParcels() {
   }
 
   const sortDorParcelFeatures = (features) => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('features:', features);
+    if (import.meta.env.VITE_DEBUG) console.log('features:', features);
     // map parcel status to a numeric priority
     // (basically so remainders come before inactives)
     const STATUS_PRIORITY = {
@@ -70,10 +70,10 @@ export default function useParcels() {
   }
 
   const getDistances = (coords) => {
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('getDistances, coords:', coords)
+    // if (import.meta.env.VITE_DEBUG) console.log('getDistances, coords:', coords)
     let turfCoordinates = [];
     for (let coordinate of coords[0]) {
-      // if (import.meta.env.VITE_DEBUG == 'true') console.log('in getDistances, coordinate:', coordinate);
+      // if (import.meta.env.VITE_DEBUG) console.log('in getDistances, coordinate:', coordinate);
       turfCoordinates.push(point(coordinate));
     }
     let distances = [];
@@ -84,10 +84,10 @@ export default function useParcels() {
   }
 
   const getMultiPolyDistances = (coords) => {
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('getMultiPolyDistances, coords:', coords)
+    // if (import.meta.env.VITE_DEBUG) console.log('getMultiPolyDistances, coords:', coords)
     let turfCoordinates = [];
     for (let coordinate of coords) {
-      // if (import.meta.env.VITE_DEBUG == 'true') console.log('in getMultiPolyDistances, coordinate:', coordinate);
+      // if (import.meta.env.VITE_DEBUG) console.log('in getMultiPolyDistances, coordinate:', coordinate);
       turfCoordinates.push(point(coordinate));
     }
     let distances = [];
@@ -100,22 +100,22 @@ export default function useParcels() {
   const calculateAreaAndPerimeter = (feature) => {
     let coords = feature.geometry.coordinates;
 
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('utils.calculateAreaAndPerimeter, feature:', feature, 'coords.length:', coords.length);
+    // if (import.meta.env.VITE_DEBUG) console.log('utils.calculateAreaAndPerimeter, feature:', feature, 'coords.length:', coords.length);
     if (coords.length > 1 || feature.geometry.type === 'MultiPolygon') {
       let distances = [];
       let areas = [];
       for (let coordsSet of coords) {
-        // if (import.meta.env.VITE_DEBUG == 'true') console.log('coordsSet:', coordsSet);
+        // if (import.meta.env.VITE_DEBUG) console.log('coordsSet:', coordsSet);
         if (coordsSet.length > 2) {
-          // if (import.meta.env.VITE_DEBUG == 'true') console.log('in multiPolygon loop');
+          // if (import.meta.env.VITE_DEBUG) console.log('in multiPolygon loop');
           const turfPolygon = multiPolygon(coordsSet);
           distances.push(this.getMultiPolyDistances(coordsSet).reduce(function(acc, val) {
             return acc + val;
           }));
           areas.push(area(turfPolygon) * 10.7639);
-          // if (import.meta.env.VITE_DEBUG == 'true') console.log('areas:', areas);
+          // if (import.meta.env.VITE_DEBUG) console.log('areas:', areas);
         } else {
-          // if (import.meta.env.VITE_DEBUG == 'true') console.log('in polygon loop');
+          // if (import.meta.env.VITE_DEBUG) console.log('in polygon loop');
           const turfPolygon = polygon(coordsSet);
           distances.push(getDistances(coordsSet).reduce(function(acc, val) {
             return acc + val;
@@ -131,10 +131,10 @@ export default function useParcels() {
       }),
       };
     }
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('coords:', coords);
+    // if (import.meta.env.VITE_DEBUG) console.log('coords:', coords);
     const turfPolygon = polygon(coords);
     let distances = getDistances(coords);
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('distances:', distances);
+    // if (import.meta.env.VITE_DEBUG) console.log('distances:', distances);
     return { perimeter: distances.reduce(function(acc, val) {
       return acc + val;
     }),

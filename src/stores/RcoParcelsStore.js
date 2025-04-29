@@ -45,7 +45,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       for (let item in groupedData){
         groupedData[item].length > 1 ? units.push.apply(units,groupedData[item]) : dataList.push(groupedData[item][0]);
       }
-      console.log('base-client evaluateDataForUnits data:', data, 'groupedData:', groupedData, 'units:', units, 'dataList:', dataList);
+      if (import.meta.env.VITE_DEBUG) console.log('base-client evaluateDataForUnits data:', data, 'groupedData:', groupedData, 'units:', units, 'dataList:', dataList);
   
       let bldgRecord = JSON.parse(JSON.stringify(data.rows[0]));
   
@@ -55,7 +55,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       }
   
       // for (let unit in units) {
-      //   console.log('inside units loop, units:', units, 'units[unit]:', units[unit], 'typeof(units[unit]):', typeof(units[unit]));
+      //   if (import.meta.env.VITE_DEBUG) console.log('inside units loop, units:', units, 'units[unit]:', units[unit], 'typeof(units[unit]):', typeof(units[unit]));
       //   if (typeof(units[unit]) === 'function') {
       //     break;
       //   }
@@ -76,16 +76,16 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     async fillOpaPropertiesPublic() {
       try {
         // const opaSet = this.pwdParcelIdsMerged.join("','");
-        console.log('fillOpaPropertiesPublic is running');
+        if (import.meta.env.VITE_DEBUG) console.log('fillOpaPropertiesPublic is running');
         const opaSet = this.pwdParcelsMerged.features.map((feature) => feature.properties.PARCEL_ID).join("','");
-        console.log('opaSet:', opaSet);
+        if (import.meta.env.VITE_DEBUG) console.log('opaSet:', opaSet);
         const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+pwd_parcel_id+in+(%27${opaSet}%27)`);
         // const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+parcel_number+in+(%27${opaSet}%27)`);
         if (response.ok) {
           let data = await response.json();
-          // console.log('data:', data);
+          // if (import.meta.env.VITE_DEBUG) console.log('data:', data);
           data.rows.forEach(item => {
-            // console.log('item:', item);
+            // if (import.meta.env.VITE_DEBUG) console.log('item:', item);
             item.parcel_address = `${item.address_std}<br>PHILADELPHIA, PA ${item.zip_code}`;
 
             item.mail_contact = '';
@@ -98,11 +98,11 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           this.opaPropertiesPublic = data;
           this.loadingOpaPropertiesPublic = false;
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('opaData - await resolved but HTTP status was not successful')
+          if (import.meta.env.VITE_DEBUG) console.warn('opaData - await resolved but HTTP status was not successful')
           this.loadingOpaPropertiesPublic = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error('opaData - await never resolved, failed to fetch address data')
+        if (import.meta.env.VITE_DEBUG) console.error('opaData - await never resolved, failed to fetch address data')
         this.loadingOpaPropertiesPublic = false;
       }
     },
@@ -134,12 +134,12 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         xyCoordsReduced.push(newXyCoordReduced);
       }
 
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
+      if (import.meta.env.VITE_DEBUG) console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
       const MainStore = useMainStore();
       try {
         const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/Zoning_RCO/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillRcoDataByParcelBounds - await resolved but HTTP status was not successful')
+          if (import.meta.env.VITE_DEBUG) console.warn('fillRcoDataByParcelBounds - await resolved but HTTP status was not successful')
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
@@ -153,9 +153,9 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
             }
             return 0;
           });
-          // console.log('data:', data);
+          // if (import.meta.env.VITE_DEBUG) console.log('data:', data);
           data.features.forEach(item => {
-            // console.log('item:', item);
+            // if (import.meta.env.VITE_DEBUG) console.log('item:', item);
             item.properties.rco = `<b>${item.properties.ORGANIZATION_NAME}</b><br>${item.properties.ORGANIZATION_ADDRESS}`;
             item.properties.contact = `${rcoPrimaryContact(item.properties.PRIMARY_NAME)}<br>${phoneNumber(item.properties.PRIMARY_PHONE)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
             if (item.properties.MEETING_LOCATION_ADDRESS.includes('Virtual: ')) {
@@ -168,12 +168,12 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           this.rcos = data;
           this.loadingRcos = false;
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('in else');
+          if (import.meta.env.VITE_DEBUG) console.log('in else');
           this.rcos = {};
           this.loadingRcos = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillRcoDataByParcelBounds await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        if (import.meta.env.VITE_DEBUG) console.error(`fillRcoDataByParcelBounds await never resolved, failed to fetch pwd parcel data by lng/lat`)
         this.rcos = {};
         this.loadingRcos = false;
       }
@@ -186,7 +186,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         let parcelsSet = new Set([...this.pwdParcelsByBlock.features, ...this.pwdParcelsByBuffer.features]);
         parcelsArray = [...parcelsSet];
       }
-      console.log('parcelsArray:', parcelsArray);
+      if (import.meta.env.VITE_DEBUG) console.log('parcelsArray:', parcelsArray);
       if (parcelsArray.length > 0) {
         this.pwdParcelsMerged = { type: 'FeatureCollection', features: parcelsArray };
       } else {
@@ -197,7 +197,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     async fillPwdParcelDataByBlock() {
       const GeocodeStore = useGeocodeStore();
       const block = GeocodeStore.aisBlockData;
-      console.log('block:', block);
+      if (import.meta.env.VITE_DEBUG) console.log('block:', block);
       if (!block.features) return;
       const blockPwd = block.features.filter((feature) => feature.properties.pwd_parcel_id);
       const parcelIds = blockPwd.map((feature) => feature.properties.pwd_parcel_id).join("','");
@@ -209,23 +209,23 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         'inSr': 4326,
         'returnGeometry': true,
       };
-      console.log('parcelIds:', parcelIds);
+      if (import.meta.env.VITE_DEBUG) console.log('parcelIds:', parcelIds);
       try {
         const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillPwdParcelDataByBlock - await resolved but HTTP status was not successful')
+          if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelDataByBlock - await resolved but HTTP status was not successful')
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
           this.pwdParcelsByBlock = data;
           this.loadingPwdParcelsByBlock = false;
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('in else');
+          if (import.meta.env.VITE_DEBUG) console.log('in else');
           this.pwdParcelsByBlock = {};
           this.loadingPwdParcelsByBlock = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillPwdParcelDataByBlock await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        if (import.meta.env.VITE_DEBUG) console.error(`fillPwdParcelDataByBlock await never resolved, failed to fetch pwd parcel data by lng/lat`)
         this.pwdParcelsByBlock = {};
         this.loadingPwdParcelsByBlock = false;
       }
@@ -247,7 +247,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       }
       // xyCoordsReduced.push([ parseFloat(xyCoords[0][0].toFixed(9)), parseFloat(xyCoords[0][1].toFixed(9)) ]);
 
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillPwdParcelDataByBuffer MapStore.bufferForParcel.geometry:', MapStore.bufferForParcel.geometry);
+      if (import.meta.env.VITE_DEBUG) console.log('fillPwdParcelDataByBuffer MapStore.bufferForParcel.geometry:', MapStore.bufferForParcel.geometry);
       let params = {
         'where': '1=1',
         'outSR': 4326,
@@ -264,19 +264,19 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       try {
         const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillPwdParcelDataByBuffer - await resolved but HTTP status was not successful')
+          if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelDataByBuffer - await resolved but HTTP status was not successful')
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
           this.pwdParcelsByBuffer = data;
           this.loadingPwdParcelsByBuffer = false;
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('in else');
+          if (import.meta.env.VITE_DEBUG) console.log('in else');
           this.pwdParcelsByBuffer = {};
           this.loadingPwdParcelsByBuffer = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error(`fillPwdParcelDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        if (import.meta.env.VITE_DEBUG) console.error(`fillPwdParcelDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
         this.pwdParcelsByBuffer = {};
         this.loadingPwdParcelsByBuffer = false;
       }

@@ -31,7 +31,7 @@ import Textbox from "@phila/phila-ui-textbox";
 import LangSelector from "@phila/phila-ui-lang-selector";
 import Modal from "@phila/phila-ui-modal";
 
-// if (import.meta.env.VITE_DEBUG == 'true') console.log('MobileNav', MobileNav, 'Dropdown:', Dropdown);
+// if (import.meta.env.VITE_DEBUG) console.log('MobileNav', MobileNav, 'Dropdown:', Dropdown);
 
 const app = createApp(App);
 
@@ -102,7 +102,7 @@ app.use(VueGoodTablePlugin);
 
 import i18nFromFiles from './i18n/i18n.js';
 const messages = i18nFromFiles.i18n.data.messages;
-if (import.meta.env.VITE_DEBUG == 'true') console.log('i18nFromFiles:', i18nFromFiles, 'messages:', messages);
+if (import.meta.env.VITE_DEBUG) console.log('i18nFromFiles:', i18nFromFiles, 'messages:', messages);
 const i18n = createI18n({
   legacy: false,
   locale: 'en-US',

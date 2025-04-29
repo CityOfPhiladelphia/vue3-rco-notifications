@@ -153,10 +153,10 @@ export default {
     async getDataForPageChange(currentPage) {
       const GeocodeStore = useGeocodeStore();
       const CondosStore = useCondosStore();
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('getDataForPageChange, currentPage:', currentPage, '10 % 10:', 10 % 10, '((currentPage-1)/10)+1', ((currentPage-1)/10)+1, 'currentPage-1 % 10:', (currentPage-1) % 10);
+      if (import.meta.env.VITE_DEBUG) console.log('getDataForPageChange, currentPage:', currentPage, '10 % 10:', 10 % 10, '((currentPage-1)/10)+1', ((currentPage-1)/10)+1, 'currentPage-1 % 10:', (currentPage-1) % 10);
       const address = GeocodeStore.aisData.features[0].properties.street_address;
       const newDataPage = Math.floor(((currentPage-1)/10)+1);
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('getDataForPageChange, currentPage:', currentPage, 'newDataPage:', newDataPage, 'address:', address);
+      if (import.meta.env.VITE_DEBUG) console.log('getDataForPageChange, currentPage:', currentPage, 'newDataPage:', newDataPage, 'address:', address);
       if (!CondosStore.condosData.pages['page_'+newDataPage]) {
         CondosStore.loadingCondosData = true;
         for (let i = 2; i <= newDataPage; i++) {
@@ -170,7 +170,7 @@ export default {
 
     // Change current page
     async changePage(pageNumber) {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('CustomPagination.vue changePage, pageNumber:', pageNumber);
+      if (import.meta.env.VITE_DEBUG) console.log('CustomPagination.vue changePage, pageNumber:', pageNumber);
       if (pageNumber > 0 && this.total > this.currentPerPage * (pageNumber - 1)) {
         await this.getDataForPageChange(pageNumber);
         this.prevPage = this.currentPage;
@@ -182,7 +182,7 @@ export default {
 
     // Go to next page
     async nextPage() {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('CustomPagination.vue nextPage, this.nextIsPossible:', this.nextIsPossible, 'this.currentPage:', this.currentPage, 'this.prevPage:', this.prevPage, 'this.total:', this.total, 'this.currentPerPage:', this.currentPerPage, 'this.pagesCount:', this.pagesCount);
+      if (import.meta.env.VITE_DEBUG) console.log('CustomPagination.vue nextPage, this.nextIsPossible:', this.nextIsPossible, 'this.currentPage:', this.currentPage, 'this.prevPage:', this.prevPage, 'this.total:', this.total, 'this.currentPerPage:', this.currentPerPage, 'this.pagesCount:', this.pagesCount);
       if (this.nextIsPossible) {
         this.prevPage = this.currentPage;
         ++this.currentPage;

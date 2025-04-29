@@ -3,7 +3,7 @@ import { ref } from 'vue';
 export default function useTables() {
 
   const paginationOptions = (tableLength, perPage) => {
-    console.log('paginationOptions, tableLength', tableLength);
+    if (import.meta.env.VITE_DEBUG) console.log('paginationOptions, tableLength', tableLength);
     return {
       enabled: tableLength > 5,
       mode: 'pages',

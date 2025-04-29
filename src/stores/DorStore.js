@@ -9,7 +9,7 @@ import useTransforms from '@/composables/useTransforms';
 const { date } = useTransforms();
 
 const cleanDorAttribute = function(attr) {
-  // if (import.meta.env.VITE_DEBUG == 'true') console.log('cleanDorAttribute is running with attr', attr);
+  // if (import.meta.env.VITE_DEBUG) console.log('cleanDorAttribute is running with attr', attr);
   // trim leading and trailing whitespace
   var cleanAttr = attr ? String(attr) : '';
   cleanAttr = cleanAttr.replace(/\s+/g, '');
@@ -24,13 +24,13 @@ const cleanDorAttribute = function(attr) {
     return '';
   }
 
-  // if (import.meta.env.VITE_DEBUG == 'true') console.log('cleanDorAttribute cleanAttr result:', cleanAttr);
+  // if (import.meta.env.VITE_DEBUG) console.log('cleanDorAttribute cleanAttr result:', cleanAttr);
   return cleanAttr;
 }
 
 // TODO put this in base config transforms
 const concatDorAddress = function(parcel, includeUnit) {
-  if (import.meta.env.VITE_DEBUG == 'true') console.log('concatDorAddress is running, parcel:', parcel);
+  if (import.meta.env.VITE_DEBUG) console.log('concatDorAddress is running, parcel:', parcel);
   includeUnit = !!includeUnit;
   var STREET_FIELDS = [ 'STDIR', 'STNAM', 'STDES', 'STDESSUF' ];
   var props = parcel.properties;
@@ -74,11 +74,11 @@ const concatDorAddress = function(parcel, includeUnit) {
   // remove nulls and concat
   address = comps.filter(Boolean).join(' ');
 
-  // if (import.meta.env.VITE_DEBUG == 'true') console.log('concatDorAddress address result:', address);
+  // if (import.meta.env.VITE_DEBUG) console.log('concatDorAddress address result:', address);
   if (address === '') {
     address = 'Parcel has no address';
   }
-  if (import.meta.env.VITE_DEBUG == 'true') console.log('concatDorAddress address result:', address);
+  if (import.meta.env.VITE_DEBUG) console.log('concatDorAddress address result:', address);
   return address;
 }
 
@@ -105,19 +105,19 @@ export const useDorStore = defineStore("DorStore", {
       return new Promise((resolve) => {
         (async () => {
           this.dorCondos = {};
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('fillRegmaps is running');
+          if (import.meta.env.VITE_DEBUG) console.log('fillRegmaps is running');
           const ParcelsStore = useParcelsStore();
           const parcels = ParcelsStore.dor.features;
           if (!parcels) return resolve();
           let baseUrl = 'https://phl.carto.com/api/v2/sql?q=';
           parcels.forEach(async(feature) => {
             try {
-              if (import.meta.env.VITE_DEBUG == 'true') console.log('feature:', feature);
+              if (import.meta.env.VITE_DEBUG) console.log('feature:', feature);
               const url = baseUrl + `select * from condominium where mapref = '${ feature.properties.MAPREG }' and status in (1,3)`;
               const response = await fetch(url);
               if (response.ok) {
                 const data = await response.json();
-                if (import.meta.env.VITE_DEBUG == 'true') console.log('fillDorCondos data:', data);
+                if (import.meta.env.VITE_DEBUG) console.log('fillDorCondos data:', data);
                 for (let row of data.rows) {
                   row.condo_parcel = row.recmap + '-' + row.condoparcel;
                   row.unit_number = 'Unit #' + row.condounit;
@@ -125,11 +125,11 @@ export const useDorStore = defineStore("DorStore", {
                 this.dorCondos[feature.properties.OBJECTID] = data;
                 return resolve();
               } else {
-                if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillDorCondos - await resolved but HTTP status was not successful');
+                if (import.meta.env.VITE_DEBUG) console.warn('fillDorCondos - await resolved but HTTP status was not successful');
                 return resolve();
               }
             } catch {
-              if (import.meta.env.VITE_DEBUG == 'true') console.error('fillDorCondos - await never resolved, failed to fetch data');
+              if (import.meta.env.VITE_DEBUG) console.error('fillDorCondos - await never resolved, failed to fetch data');
               return resolve();
             }
           });
@@ -139,7 +139,7 @@ export const useDorStore = defineStore("DorStore", {
     async fillRegmaps() {
       return new Promise((resolve) => {
         (async () => {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('fillRegmaps is running');
+          if (import.meta.env.VITE_DEBUG) console.log('fillRegmaps is running');
           this.regmaps = {};
           const ParcelsStore = useParcelsStore();
           const parcels = ParcelsStore.dor.features;
@@ -203,7 +203,7 @@ export const useDorStore = defineStore("DorStore", {
           var bbox = [ xMin, yMin, xMax, yMax ];
           var bounds = bboxPolygon(bbox).geometry;
 
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('regmaps.js, bounds:', bounds);
+          if (import.meta.env.VITE_DEBUG) console.log('regmaps.js, bounds:', bounds);
 
           let url = '//services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/MASTERMAPINDEX/FeatureServer/0/query'; //+ [relationship](targetGeom);
           let params = {
@@ -224,11 +224,11 @@ export const useDorStore = defineStore("DorStore", {
               this.regmaps = response;
               return resolve();
             } else {
-              if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillRegmaps - await resolved but HTTP status was not successful');
+              if (import.meta.env.VITE_DEBUG) console.warn('fillRegmaps - await resolved but HTTP status was not successful');
               return resolve();
             }
           } catch {
-            if (import.meta.env.VITE_DEBUG == 'true') console.error('fillRegmaps - await never resolved, failed to fetch data');
+            if (import.meta.env.VITE_DEBUG) console.error('fillRegmaps - await never resolved, failed to fetch data');
             return resolve();
           }
         })();
@@ -237,7 +237,7 @@ export const useDorStore = defineStore("DorStore", {
     async fillDorDocuments() {
       return new Promise((resolve) => {
         (async () => {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('fillDorDocuments is running');
+          if (import.meta.env.VITE_DEBUG) console.log('fillDorDocuments is running');
 
           this.dorDocuments = {};
           const ParcelsStore = useParcelsStore();
@@ -245,7 +245,7 @@ export const useDorStore = defineStore("DorStore", {
           const url = `//services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/RTT_SUMMARY/FeatureServer/0/query`;
           
           const where = function(feature) {
-            if (import.meta.env.VITE_DEBUG == 'true') console.log('where function is running, feature:', feature);
+            if (import.meta.env.VITE_DEBUG) console.log('where function is running, feature:', feature);
             // METHOD 1: via address
             var parcelBaseAddress = concatDorAddress(feature);
             var geocode = GeocodeStore.aisData.features[0].properties;
@@ -298,7 +298,7 @@ export const useDorStore = defineStore("DorStore", {
               // check for unit num
               var unitNum = cleanDorAttribute(feature.properties.UNIT),
                 unitNum2 = geocode.unit_num;
-              // if (import.meta.env.VITE_DEBUG == 'true') console.log('unitNum:', unitNum, 'unitNum2:', unitNum2);
+              // if (import.meta.env.VITE_DEBUG) console.log('unitNum:', unitNum, 'unitNum2:', unitNum2);
           
               if (unitNum) {
                 where += " AND UNIT_NUM = '" + unitNum + "'";
@@ -311,7 +311,7 @@ export const useDorStore = defineStore("DorStore", {
               where += " or REG_MAP_ID = '" + ParcelsStore.dor.features[0].properties.BASEREG + "'";
             }
 
-            if (import.meta.env.VITE_DEBUG == 'true') console.log('address_low:', address_low, 'address_floor:', address_floor,
+            if (import.meta.env.VITE_DEBUG) console.log('address_low:', address_low, 'address_floor:', address_floor,
               'address_remainder:', address_remainder, 'addressHigh:', addressHigh,
               'addressCeil:', addressCeil, 'geocode.street_predir:', geocode.street_predir,
               'geocode.address_low_suffix:', geocode.address_low_suffix,
@@ -327,11 +327,11 @@ export const useDorStore = defineStore("DorStore", {
           if (!ParcelsStore.dor.features) {
             return resolve();
           }
-          // if (import.meta.env.VITE_DEBUG == 'true') console.log('ParcelsStore.dor.features:', ParcelsStore.dor.features);
+          // if (import.meta.env.VITE_DEBUG) console.log('ParcelsStore.dor.features:', ParcelsStore.dor.features);
           for (let feature of ParcelsStore.dor.features) {
-            // if (import.meta.env.VITE_DEBUG == 'true') console.log('in loop before try, feature:', feature);
+            // if (import.meta.env.VITE_DEBUG) console.log('in loop before try, feature:', feature);
             try {
-              // if (import.meta.env.VITE_DEBUG == 'true') console.log('in loop in try, feature:', feature);
+              // if (import.meta.env.VITE_DEBUG) console.log('in loop in try, feature:', feature);
               let theWhere = where(feature);
                 
               const params = {
@@ -345,7 +345,7 @@ export const useDorStore = defineStore("DorStore", {
                 sqlFormat: 'standard',
               }
 
-              // if (import.meta.env.VITE_DEBUG == 'true') console.log('params:', params);
+              // if (import.meta.env.VITE_DEBUG) console.log('params:', params);
               const response = await axios(url, { params });
               if (response.status === 200) {
                 const data = response.data;
@@ -356,11 +356,11 @@ export const useDorStore = defineStore("DorStore", {
                 this.dorDocuments[feature.properties.OBJECTID] = data;
                 // return resolve();
               } else {
-                if (import.meta.env.VITE_DEBUG == 'true') console.warn('dorDocs - await resolved but HTTP status was not successful')
+                if (import.meta.env.VITE_DEBUG) console.warn('dorDocs - await resolved but HTTP status was not successful')
                 // return resolve();
               }
             } catch {
-              if (import.meta.env.VITE_DEBUG == 'true') console.error('dorDocs - await never resolved, failed to fetch data')
+              if (import.meta.env.VITE_DEBUG) console.error('dorDocs - await never resolved, failed to fetch data')
               // return resolve();
             }
           }

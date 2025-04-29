@@ -363,9 +363,7 @@ watch(
         // if (import.meta.env.VITE_DEBUG) console.log('feature:', feature)//, 'feature.properties.PARCEL_ID:', feature.properties.PARCEL_ID, 'newHoveredStateId:', newHoveredStateId);
         feature.properties.PARCEL_ID === newHoveredStateId;//[0]
       })[0];
-      const index = map.getStyle().sources.pwdParcels.data.features.indexOf(feature);
-      if (import.meta.env.VITE_DEBUG) console.log('feature:', feature, 'index:', index, 'map.getStyle().sources.pwdParcels.data.features:', map.getStyle().sources.pwdParcels.data.features.filter(feature => feature.properties.id === newHoveredStateId)[0]);
-      console.log("map.getSource('pwdParcels'):", map.getSource('pwdParcels'), "map.getStyle().sources.pwdParcels.data:", map.getStyle().sources.pwdParcels.data);
+      // if (import.meta.env.VITE_DEBUG) console.log("map.getSource('pwdParcels'):", map.getSource('pwdParcels'), "map.getStyle().sources.pwdParcels.data:", map.getStyle().sources.pwdParcels.data);
       map.getSource('pwdParcels').setData(map.getStyle().sources.pwdParcels.data);
       // if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources:', map.getStyle().sources.filter(source => source.id === 'pwdParcels')[0]);
       map.setPaintProperty(

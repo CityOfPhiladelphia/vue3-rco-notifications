@@ -15,9 +15,9 @@ export default function useTransforms() {
   const date = (value) => {
     if (!value) return;
     let valueTransformed;
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('date transform running, value:', value, 'typeof value:', typeof value);
+    if (import.meta.env.VITE_DEBUG) console.log('date transform running, value:', value, 'typeof value:', typeof value);
     // if (typeof value === 'string') {
-      // console.log('date transform parseISO(value):', parseISO(value));
+      // if (import.meta.env.VITE_DEBUG) console.log('date transform parseISO(value):', parseISO(value));
     valueTransformed = formatInTimeZone(value, 'America/New_York', 'MM/dd/yyyy');
     // } else {
     //   valueTransformed = formatInTimeZone(value, 'America/New_York', 'MM/dd/yyyy');
@@ -43,7 +43,7 @@ export default function useTransforms() {
   }
 
   const nth = (n) => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('nth transform, n:', n, 'n%100>>3^1&&n%10:', n%100>>3^1&&n%10);
+    if (import.meta.env.VITE_DEBUG) console.log('nth transform, n:', n, 'n%100>>3^1&&n%10:', n%100>>3^1&&n%10);
     return n + ([ 'th', 'st','nd','rd' ][n%100>>3^1&&n%10]||'th');
   }
   const phoneNumber = (value) => {
@@ -62,7 +62,7 @@ export default function useTransforms() {
 
   const prettyNumber = (value) => {
     let result;
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('value:', value, 'typeof value:', typeof value);
+    // if (import.meta.env.VITE_DEBUG) console.log('value:', value, 'typeof value:', typeof value);
     if (!isNaN(value) && typeof value !== 'object') {
       result = value.toLocaleString();
     }
@@ -71,7 +71,7 @@ export default function useTransforms() {
 
   const integer = (value) => {
     let result;
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('value:', value, 'typeof value:', typeof value);
+    // if (import.meta.env.VITE_DEBUG) console.log('value:', value, 'typeof value:', typeof value);
     if (!isNaN(value) && typeof value !== 'object') {
       result = parseInt(value)
     }
@@ -161,7 +161,7 @@ export default function useTransforms() {
   // },
   // nth: {
   //   transform: function(n) {
-  //     if (import.meta.env.VITE_DEBUG == 'true') console.log('nth transform, n:', n, 'n%100>>3^1&&n%10:', n%100>>3^1&&n%10);
+  //     if (import.meta.env.VITE_DEBUG) console.log('nth transform, n:', n, 'n%100>>3^1&&n%10:', n%100>>3^1&&n%10);
   //     return n + ([ 'th', 'st','nd','rd' ][n%100>>3^1&&n%10]||'th');
   //   },
   // },
@@ -191,7 +191,7 @@ export default function useTransforms() {
   // i18nSubstitute: {
   //   transform: function(str) {
   //     let test = str.split('$t(');
-  //     if (import.meta.env.VITE_DEBUG == 'true') console.log('i18nSubstitute is running, str:', str, 'test:', test, 'this.$config.i18n', this.$config.i18n);
+  //     if (import.meta.env.VITE_DEBUG) console.log('i18nSubstitute is running, str:', str, 'test:', test, 'this.$config.i18n', this.$config.i18n);
   //     return voting.topic.accessibilityCodes.informationNotAvailable;
   //   },
   // },

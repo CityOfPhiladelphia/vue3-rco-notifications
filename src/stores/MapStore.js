@@ -46,7 +46,7 @@ export const useMapStore = defineStore("MapStore", {
       this.cyclomediaCameraLngLat = lngLat;
     },
     setMap(map) {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('MapStore.setMap is running, map:', map);
+      if (import.meta.env.VITE_DEBUG) console.log('MapStore.setMap is running, map:', map);
       this.map = map;
     },
     setMapStyle(style) {

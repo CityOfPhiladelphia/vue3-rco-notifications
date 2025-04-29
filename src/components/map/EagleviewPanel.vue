@@ -51,7 +51,7 @@ watch(
   () => currentAddressCoords.value,
   newValue => {
     if (newValue) {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('currentAddressCoords changed:', newValue);
+      if (import.meta.env.VITE_DEBUG) console.log('currentAddressCoords changed:', newValue);
       map.setView({ lonLat: newValue });
       map.removeFeatures();
       map.addFeatures({
@@ -73,7 +73,7 @@ onMounted( async() => {
   map.enableMeasurementPanel(false);
   map.enableSearchBar(false);
   map.setView({ lonLat: currentAddressCoords.value, zoom: 17, pitch: 0, rotation: 0 }, (value) => {
-    if (import.meta.env.VITE_DEBUG == 'true') console.log('eagleview view has been set, value:', value)
+    if (import.meta.env.VITE_DEBUG) console.log('eagleview view has been set, value:', value)
   });
   if (MapStore.currentAddressCoords.length) {
     map.addFeatures({
@@ -87,7 +87,7 @@ onMounted( async() => {
   }
 
   // map.on('onViewUpdate', (value) => {
-    // if (import.meta.env.VITE_DEBUG == 'true') console.log('eagleview view has been updated, value:', value);
+    // if (import.meta.env.VITE_DEBUG) console.log('eagleview view has been updated, value:', value);
     // if (value.zoom < 18) {
       // map.setView({ zoom: 18, lonLat: value.lonLat, pitch: value.pitch, rotation: value.rotation });
     // }

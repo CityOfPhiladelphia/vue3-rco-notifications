@@ -28,7 +28,7 @@ export const useParcelsStore = defineStore('ParcelsStore', {
       const aisData = AddressLoaded[0];
       const pwdParcelNumber = aisData.properties.pwd_parcel_id;
       if (!pwdParcelNumber) {
-        if (import.meta.env.VITE_DEBUG == 'true') console.log('no pwd parcel in AIS')
+        if (import.meta.env.VITE_DEBUG) console.log('no pwd parcel in AIS')
         await this.checkParcelDataByLngLat(aisData.geometry.coordinates[0], aisData.geometry.coordinates[1], 'pwd');
         this.pwd = this.pwdChecked;
         return;
@@ -38,10 +38,10 @@ export const useParcelsStore = defineStore('ParcelsStore', {
         if (response.ok) {
           this.pwd = await response.json()
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillPwdParcelData - await resolved but HTTP status was not successful');
+          if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelData - await resolved but HTTP status was not successful');
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error('fillPwdParcelData - await never resolved, failed to fetch parcel data');
+        if (import.meta.env.VITE_DEBUG) console.error('fillPwdParcelData - await never resolved, failed to fetch parcel data');
       }
     },
 
@@ -52,7 +52,7 @@ export const useParcelsStore = defineStore('ParcelsStore', {
       const aisData = AddressLoaded[0];
       const dorParcelId = aisData.properties.dor_parcel_id;
       if (!dorParcelId) {
-        if (import.meta.env.VITE_DEBUG == 'true') console.log('no dor parcel in AIS')
+        if (import.meta.env.VITE_DEBUG) console.log('no dor parcel in AIS')
         await this.checkParcelDataByLngLat(aisData.geometry.coordinates[0], aisData.geometry.coordinates[1], 'dor');
         this.dor = this.dorChecked;
         return;
@@ -90,22 +90,22 @@ export const useParcelsStore = defineStore('ParcelsStore', {
       try {
         const response = await axios(parcelQuery, { params });
         if (response.status === 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('response', response);
+          if (import.meta.env.VITE_DEBUG) console.log('response', response);
           const originalJson = await response.data;
           const processedData = await processParcels(originalJson);
           const MainStore = useMainStore();
           MainStore.selectedParcelId = processedData.features[0].properties.OBJECTID;
           this.dor = processedData;
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('fillDorParcelData - await resolved but HTTP status was not successful');
+          if (import.meta.env.VITE_DEBUG) console.warn('fillDorParcelData - await resolved but HTTP status was not successful');
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error('fillDorParcelData - await never resolved, failed to fetch parcel data');
+        if (import.meta.env.VITE_DEBUG) console.error('fillDorParcelData - await never resolved, failed to fetch parcel data');
       }
     },
 
     async checkParcelDataByLngLat(lng, lat, parcelLayer) {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('checkParcelDataByLngLat, lng:', lng, 'lat:', lat, 'parcelLayer:', parcelLayer);
+      if (import.meta.env.VITE_DEBUG) console.log('checkParcelDataByLngLat, lng:', lng, 'lat:', lat, 'parcelLayer:', parcelLayer);
       let ESRILayer = parcelLayer === 'pwd' ? 'PWD_PARCELS' : 'DOR_Parcel';
       let params = {
         'where': '1=1',
@@ -121,7 +121,7 @@ export const useParcelsStore = defineStore('ParcelsStore', {
       try {
         const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/${ESRILayer}/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.warn('checkParcelDataByLngLat - await resolved but HTTP status was not successful')
+          if (import.meta.env.VITE_DEBUG) console.warn('checkParcelDataByLngLat - await resolved but HTTP status was not successful')
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
@@ -135,11 +135,11 @@ export const useParcelsStore = defineStore('ParcelsStore', {
           }
           this[`${parcelLayer}Checked`] = processedData;
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('in else, parcelLayer:', parcelLayer);
+          if (import.meta.env.VITE_DEBUG) console.log('in else, parcelLayer:', parcelLayer);
           this[`${parcelLayer}Checked`] = {};
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error(`checkParcelDataByLngLat await never resolved, failed to fetch ${parcelLayer} parcel data by lng/lat`)
+        if (import.meta.env.VITE_DEBUG) console.error(`checkParcelDataByLngLat await never resolved, failed to fetch ${parcelLayer} parcel data by lng/lat`)
         this[`${parcelLayer}Checked`] = {};
       }
     },

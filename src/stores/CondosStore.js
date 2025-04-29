@@ -19,7 +19,7 @@ export const useCondosStore = defineStore('CondosStore', {
   },
   actions: {
     async fillCondoData(address, page = 1) {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('fillCondoData is running, address', address, 'page:', page);
+      if (import.meta.env.VITE_DEBUG) console.log('fillCondoData is running, address', address, 'page:', page);
       try {
         const GeocodeStore = useGeocodeStore();
         const AddressLoaded = GeocodeStore.aisData.features
@@ -31,9 +31,9 @@ export const useCondosStore = defineStore('CondosStore', {
           page: page,
         };
         const response = await axios(`https://api.phila.gov/ais/v1/search/${encodeURIComponent(address)}`, { params });
-        // if (import.meta.env.VITE_DEBUG == 'true') console.log('condos response:', response);
+        // if (import.meta.env.VITE_DEBUG) console.log('condos response:', response);
         if (response.status === 200) {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('Condos - await resolved and HTTP status is successful')
+          if (import.meta.env.VITE_DEBUG) console.log('Condos - await resolved and HTTP status is successful')
           this.dataPageFilled = page;
           if (response.data.features.length > 0) {
             let newData = {
@@ -41,9 +41,9 @@ export const useCondosStore = defineStore('CondosStore', {
               // total_size: response.data.total_size,
               features: [],
             }
-            // if (import.meta.env.VITE_DEBUG == 'true') console.log('in condo-list, data:', data, 'state:', state);
+            // if (import.meta.env.VITE_DEBUG) console.log('in condo-list, data:', data, 'state:', state);
             for (let feature of response.data.features) {
-              // if (import.meta.env.VITE_DEBUG == 'true') console.log('feature.properties.address_low_frac:', feature.properties.address_low_frac, 'aisData.properties.address_low_frac:', aisData.properties.address_low_frac, 'feature.properties.street_address:', feature.properties.street_address, 'aisData.properties.street_address:', aisData.properties.street_address);
+              // if (import.meta.env.VITE_DEBUG) console.log('feature.properties.address_low_frac:', feature.properties.address_low_frac, 'aisData.properties.address_low_frac:', aisData.properties.address_low_frac, 'feature.properties.street_address:', feature.properties.street_address, 'aisData.properties.street_address:', aisData.properties.street_address);
               if (feature.properties.address_low_frac !== aisData.properties.address_low_frac || feature.properties.street_address === aisData.properties.street_address) {
                 // return;
                 response.data.total_size = response.data.total_size - 1;
@@ -58,10 +58,10 @@ export const useCondosStore = defineStore('CondosStore', {
             this.condosData.pages['page_'+page] = newData;
           }
         } else {
-          if (import.meta.env.VITE_DEBUG == 'true') console.log('Condos - await resolved but no data features')
+          if (import.meta.env.VITE_DEBUG) console.log('Condos - await resolved but no data features')
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG == 'true') console.error('Condos - await never resolved, failed to fetch condo data')
+        if (import.meta.env.VITE_DEBUG) console.error('Condos - await never resolved, failed to fetch condo data')
       }
     },
   }
