@@ -31,8 +31,9 @@ bulmaToast.setDefaults({
 });
 
 const route = useRoute();
-
 const address = computed(() => MainStore.currentAddress);
+const hoveredStateAddress = computed(() => { return MainStore.hoveredStateAddress; });
+const hoveredStateBuilding = computed(() => { return MainStore.hoveredStateBuilding; });
 
 // RCOs
 const rcosCompareFn = (a, b) => {
@@ -353,10 +354,10 @@ watch(
         id="properties"
         :columns="propertiesTableData.columns"
         :rows="propertiesTableData.rows"
-        :row-style-class="row => hoveredStateId === row.pwd_parcel_id ? 'active-hover ' + row.pwd_parcel_id : 'inactive ' + row.pwd_parcel_id"
+        :row-style-class="row => hoveredStateAddress === row.parcel_number ? 'active-hover ' + row.parcel_number : 'inactive ' + row.parcel_number"
         :pagination-options="propertiesPaginationOptions"
-        style-class="table"
-        @row-mouseenter="handleRowMouseover($event, 'pwd_parcel_id')"
+        style-class="table rco-table"
+        @row-mouseenter="handleRowMouseover($event, 'pwd_parcel_id', 'parcel_number')"
         @row-mouseleave="handleRowMouseleave"
         @row-click="handleParcelRowClick($event, 'pwd_parcel_id', 'pwdParcel')"
       >

@@ -352,12 +352,11 @@ watch(
   }
 );
 
-// for Nearby topic, watch the id of the circle marker that is hovered on to change the color of the circle
-const hoveredStateId = computed(() => { return MainStore.hoveredStateId; })
+// watch the id of the parcel that is hovered on in the table to change the color of the parcel
+const hoveredStateBuilding = computed(() => { return MainStore.hoveredStateBuilding; })
 watch(
-  () => hoveredStateId.value,
+  () => hoveredStateBuilding.value,
   newHoveredStateId => {
-    // if (import.meta.env.VITE_DEBUG) console.log('Map.vue hoveredStateId watch, newHoveredStateId:', newHoveredStateId, 'map.getStyle().sources.pwdParcels.data.features:', map.getStyle().sources.pwdParcels.data.features);
     if (newHoveredStateId) {
       if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources.pwdParcels.data.features', map.getStyle().sources.pwdParcels.data.features, 'newHoveredStateId:', newHoveredStateId);
       const feature = map.getStyle().sources.pwdParcels.data.features.filter(feature => {
@@ -366,8 +365,6 @@ watch(
       })[0];
       const index = map.getStyle().sources.pwdParcels.data.features.indexOf(feature);
       if (import.meta.env.VITE_DEBUG) console.log('feature:', feature, 'index:', index, 'map.getStyle().sources.pwdParcels.data.features:', map.getStyle().sources.pwdParcels.data.features.filter(feature => feature.properties.id === newHoveredStateId)[0]);
-      // map.getStyle().sources.pwdParcels.data.features.splice(index, 1);
-      // map.getStyle().sources.pwdParcels.data.features.push(feature);
       console.log("map.getSource('pwdParcels'):", map.getSource('pwdParcels'), "map.getStyle().sources.pwdParcels.data:", map.getStyle().sources.pwdParcels.data);
       map.getSource('pwdParcels').setData(map.getStyle().sources.pwdParcels.data);
       // if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources:', map.getStyle().sources.filter(source => source.id === 'pwdParcels')[0]);
@@ -397,7 +394,7 @@ watch(
         ['match',
         ['get', 'PARCEL_ID'],
         newHoveredStateId,
-        "white",
+        "#fffd7d",
         "#e68c6c",
       ]
       );

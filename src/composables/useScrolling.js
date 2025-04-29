@@ -3,7 +3,7 @@ import { useMainStore } from '@/stores/MainStore';
 export default function useScrolling() {
 
   const handleRcoRowClick = (e, id, type) => {
-    if (import.meta.env.VITE_DEBUG) console.log('handleRcoRowClick, e:', e, 'e.row.lat:', e.row.lat, 'id:', id);
+    // if (import.meta.env.VITE_DEBUG) console.log('handleRcoRowClick, e:', e, 'e.row.lat:', e.row.lat, 'id:', id);
     let clickedRow = {
       type: type,
       id: e.row.properties[id],
@@ -25,21 +25,21 @@ export default function useScrolling() {
   }
 
   const handleParcelRowClick = (e) => {
-    if (import.meta.env.VITE_DEBUG) console.log('handleParcelRowClick, e:', e, 'e.row.geocode_lat:', e.row.geocode_lat);
+    // if (import.meta.env.VITE_DEBUG) console.log('handleParcelRowClick, e:', e, 'e.row.geocode_lat:', e.row.geocode_lat);
     const MainStore = useMainStore();
     MainStore.clickedParcelRow = [e.row.geocode_lon, e.row.geocode_lat];
   }
 
-  const handleRowMouseover = (e, id) => {
+  const handleRowMouseover = (e, buildingId, addressId) => {
     const MainStore = useMainStore();
-    // if (import.meta.env.VITE_DEBUG) console.log('handleRowMouseover, e:', e, 'id:', id);
-    const hoveredStateId = e.row[id];
-    // if (import.meta.env.VITE_DEBUG) console.log('handleRowMouseover, e:', e, 'id:', id, 'e.row[id]:', e.row[id], 'hoveredStateId:', hoveredStateId);
-    MainStore.hoveredStateId = hoveredStateId;
+    // if (import.meta.env.VITE_DEBUG) console.log('handleRowMouseover, e:', e);
+    MainStore.hoveredStateBuilding = e.row[buildingId];
+    MainStore.hoveredStateAddress = e.row[addressId];
   }
   const handleRowMouseleave = () => {
     const MainStore = useMainStore();
-    MainStore.hoveredStateId = '';
+    MainStore.hoveredStateBuilding = '';
+    MainStore.hoveredStateAddress = '';
   }
 
   const isElementInViewport = (el) => {
