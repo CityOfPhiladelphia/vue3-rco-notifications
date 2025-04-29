@@ -23,6 +23,7 @@ export const useMainStore = defineStore("MainStore", {
       currentNearbyTimeInterval: {},
       dataSourcesLoadedArray: [],
       clickedRow: [],
+      clickedParcelRow: [],
       clickedMarkerId: null,
       hoveredStateId: null,
       selectedParcelId: null,

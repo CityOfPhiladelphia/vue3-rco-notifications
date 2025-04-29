@@ -217,7 +217,7 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
       source: 'pwdParcels',
       layout: {},
       paint: {
-        'fill-color': '#e6987c',
+        'fill-color': '#e68c6c',
         'fill-opacity': 0.3,
       },
     },
@@ -227,8 +227,8 @@ const pwdDrawnMapStyle = mergeDeep(imageryInfo,{
       source: 'pwdParcels',
       layout: {},
       paint: {
-        'line-color': '#444444',
-        'line-width': 2,
+        'line-color': '#575757',
+        'line-width': 1.5,
       }
     },
     {

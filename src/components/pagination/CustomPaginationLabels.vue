@@ -146,6 +146,7 @@ export default {
   watch: {
     perPage: {
       handler(newValue, oldValue) {
+        if (import.meta.env.VITE_DEBUG) console.log('watch perPage, newValue:', newValue, 'oldValue:', oldValue);
         this.handlePerPage();
         this.perPageChanged(oldValue);
       },
@@ -154,6 +155,7 @@ export default {
 
     customRowsPerPageDropdown: {
       handler() {
+        if (import.meta.env.VITE_DEBUG) console.log('watch customRowsPerPageDropdown');
         this.handlePerPage();
       },
       deep: true,
@@ -161,6 +163,8 @@ export default {
 
     total: {
       handler(newValue) {
+        // this.handlePerPage();
+        if (import.meta.env.VITE_DEBUG) console.log('watch total changed, newValue:', newValue, 'this.currentPerPage:', this.currentPerPage, 'this.rowsPerPageOptions:', this.rowsPerPageOptions);
         if(this.rowsPerPageOptions.indexOf(this.currentPerPage) === -1) {
           this.currentPerPage = newValue;
         }
@@ -169,6 +173,7 @@ export default {
   },
 
   mounted() {
+    if (import.meta.env.VITE_DEBUG) console.log('CustomPaginationLabels mounted');
   },
 
   methods: {
@@ -186,7 +191,7 @@ export default {
 
     // Go to next page
     nextPage() {
-      if (import.meta.env.VITE_DEBUG == 'true') console.log('nextPage is running, this.nextIsPossible:', this.nextIsPossible, 'this.currentPage:', this.currentPage);
+      if (import.meta.env.VITE_DEBUG) console.log('nextPage is running, this.nextIsPossible:', this.nextIsPossible, 'this.currentPage:', this.currentPage);
       if (this.nextIsPossible) {
         this.prevPage = this.currentPage;
         ++this.currentPage;
@@ -215,6 +220,7 @@ export default {
 
     // Indicate per page changing
     perPageChanged(oldValue) {
+      if (import.meta.env.VITE_DEBUG) console.log('perPageChanged is running, this.currentPerPage:', this.currentPerPage, 'this.perPage:', this.perPage, 'oldValue:', oldValue);
       // go back to first page
       if (oldValue) {
         //* only emit if this isn't first initialization

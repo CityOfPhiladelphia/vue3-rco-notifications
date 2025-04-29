@@ -20,7 +20,7 @@ import RCOIntro from '@/components/intros/RCOIntro.vue';
 import { useRoute } from 'vue-router';
 
 import useScrolling from '@/composables/useScrolling';
-const { handleRowClick } = useScrolling();
+const { handleRcoRowClick, handleParcelRowClick, handleRowMouseover, handleRowMouseleave } = useScrolling();
 
 import * as bulmaToast from 'bulma-toast'
 
@@ -127,12 +127,18 @@ const rcosTableData = computed(() => {
     columns: [
       {
         label: 'RCO',
-        field: 'properties.rco',
+        field: 'properties.ORGANIZATION_NAME',
+        // field: 'properties.rco',
         html: true,
       },
       {
+        label: 'RCO Address',
+        field: 'properties.ORGANIZATION_ADDRESS',
+      },
+      {
         label: 'Meeting Address',
-        field: 'properties.MEETING_LOCATION_ADDRESS',
+        field: 'properties.meeting_address',
+        html: true,
       },
       {
         label: 'Primary Contact',
@@ -152,7 +158,8 @@ const rcosTablePerPage = ref(5);
 
 const rcosPaginationOptions = computed(() => {
   return {
-    enabled: rcosTableData.value.rows.length > 5,
+    enabled: false,
+    // enabled: rcosTableData.value.rows.length > 5,
     mode: 'pages',
     perPage: rcosTablePerPage.value,
     position: 'top',
@@ -167,7 +174,7 @@ const rcosPaginationOptions = computed(() => {
 });
 
 const rcoPerPageChanged = (e) => {
-  console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
+  if (import.meta.env.VITE_DEBUG) console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
   rcosTablePerPage.value = e.currentPerPage;
 };
 
@@ -181,11 +188,11 @@ const propertiesTableData = computed(() => {
         // filterable: true,
         // sortable: true,
       },
-      {
-        label: 'Contact Mailing Address',
-        field: 'mail_contact',
-        html: true,
-      },
+      // {
+      //   label: 'Contact Mailing Address',
+      //   field: 'mail_contact',
+      //   html: true,
+      // },
     ],
     rows: opaProperties.value || [],
   }
@@ -210,7 +217,7 @@ const propertiesPaginationOptions = computed(() => {
 });
 
 const propertiesPerPageChanged = (e) => {
-  console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
+  if (import.meta.env.VITE_DEBUG) console.log('perPageChanged is running, e.currentPerPage:', e.currentPerPage);
   propertiesTablePerPage.value = e.currentPerPage;
 };
 
@@ -228,7 +235,7 @@ const exportRcos = () => {
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
     encodedUri += newEncodedUri;
   });
-  console.log('csvContent:', csvContent, 'encodedUri:', encodedUri);
+  if (import.meta.env.VITE_DEBUG) console.log('csvContent:', csvContent, 'encodedUri:', encodedUri);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
   link.setAttribute('download', 'rcos.csv');
@@ -248,10 +255,10 @@ const exportProperties = () => {
     if (item.mailing_street) newCsvContent+=`${item.mailing_street.replaceAll(',', '').replaceAll('#', '')} `;
     newCsvContent+=`${item.mailing_city_state} ${item.mailing_zip}`;
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
-    console.log('newCsvContent:', newCsvContent, 'newEncodedUri:', newEncodedUri);
+    if (import.meta.env.VITE_DEBUG) console.log('newCsvContent:', newCsvContent, 'newEncodedUri:', newEncodedUri);
     encodedUri += newEncodedUri;
   });
-  // console.log('encodedUri:', encodedUri);
+  // if (import.meta.env.VITE_DEBUG) console.log('encodedUri:', encodedUri);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
   link.setAttribute('download', 'properties.csv');
@@ -362,8 +369,8 @@ watch(
           :columns="rcosTableData.columns"
           :rows="rcosTableData.rows"
           :pagination-options="rcosPaginationOptions"
-          style-class="table nearby-table"
-          @row-click="handleRowClick($event, 'ORGANIZATION_NAME', 'RCO')"
+          style-class="table rco-table"
+          @row-click="handleRcoRowClick($event, 'ORGANIZATION_NAME', 'RCO')"
         >
           <template #emptystate>
             <div v-if="RcoParcelsStore.loadingRcos">
@@ -386,16 +393,16 @@ watch(
             </button>
           </template>
 
-          <!-- <template #table-row="props">
-            <span v-if="props.column.label == 'Address'">
-              <span style="font-weight: bold; color: blue;">{{props.row.address_std}}</span> 
+          <template #table-row="props">
+            <span v-if="props.column.label == 'RCO'">
+              <span style="font-weight: bold;">{{props.row.properties.ORGANIZATION_NAME}}</span> 
             </span>
-            <span v-else>
-              {{props.formattedRow[props.column.field]}}
+            <span v-else-if="props.column.label == 'Meeting Address'">
+              <div style="width: 150px; word-break: break-word" v-html="props.row.properties.meeting_address"></div> 
             </span>
-          </template> -->
+          </template>
 
-          <template #pagination-top="props">
+          <!-- <template #pagination-top="props">
             <custom-pagination-labels
               :test="function() { console.log('test, props:', props); }()"
               :mode="'pages'"
@@ -406,7 +413,7 @@ watch(
               @per-page-changed-left-panel="rcoPerPageChanged"
             >
             </custom-pagination-labels>
-          </template>
+          </template> -->
         </vue-good-table>
       </div>
     </div>
@@ -421,17 +428,21 @@ watch(
         />
         <span v-else>({{ opaPropertiesLength }})</span>
       </h2>
-      <div
+      <!-- <div
         v-show="propertiesTableData.rows"
         class="horizontal-table"
-      >
+      > -->
       <!-- v-if="route.name !== 'home' && route.name !== 'not-found' && propertiesTableData.rows && propertiesTableData.rows.length > 0" -->
         <vue-good-table
           id="properties"
           :columns="propertiesTableData.columns"
           :rows="propertiesTableData.rows"
+          :row-style-class="row => hoveredStateId === row.pwd_parcel_id ? 'active-hover ' + row.pwd_parcel_id : 'inactive ' + row.pwd_parcel_id"
           :pagination-options="propertiesPaginationOptions"
           style-class="table"
+          @row-mouseenter="handleRowMouseover($event, 'pwd_parcel_id')"
+          @row-mouseleave="handleRowMouseleave"
+          @row-click="handleParcelRowClick($event, 'pwd_parcel_id', 'pwdParcel')"
         >
           <template #emptystate>
             <div v-if="RcoParcelsStore.loadingOpaPropertiesPublic">
@@ -467,7 +478,7 @@ watch(
           </template>
         </vue-good-table>
       </div>
-    </div>
+    <!-- </div> -->
   </div>
 
 </template>

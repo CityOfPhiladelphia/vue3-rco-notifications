@@ -158,6 +158,12 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
             // console.log('item:', item);
             item.properties.rco = `<b>${item.properties.ORGANIZATION_NAME}</b><br>${item.properties.ORGANIZATION_ADDRESS}`;
             item.properties.contact = `${rcoPrimaryContact(item.properties.PRIMARY_NAME)}<br>${phoneNumber(item.properties.PRIMARY_PHONE)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
+            if (item.properties.MEETING_LOCATION_ADDRESS.includes('Virtual: ')) {
+              item.properties.meeting_address = item.properties.MEETING_LOCATION_ADDRESS.split('Virtual: ')[0] + `Virtual: <a target="_blank" href="${item.properties.MEETING_LOCATION_ADDRESS.split('Virtual: ')[1]}">${item.properties.MEETING_LOCATION_ADDRESS.split('Virtual: ')[1]}</a>`;
+            } else {
+              item.properties.meeting_address = item.properties.MEETING_LOCATION_ADDRESS;
+            }
+
           })
           this.rcos = data;
           this.loadingRcos = false;
