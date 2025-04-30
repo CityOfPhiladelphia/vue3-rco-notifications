@@ -12,18 +12,20 @@ jobs:
 
     runs-on: ubuntu-latest
     environment: development
+
     permissions:
       id-token: write
       contents: read
+
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js 22.x
       uses: actions/setup-node@v3
       with:
         node-version: '22.x'
         cache: 'npm'
     - name: Configure AWS Credentials
-    - uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: arn:aws:iam::922311303087:role/github-actions@dpd-rco-notification-map-dev@main
         aws-region: us-east-1
