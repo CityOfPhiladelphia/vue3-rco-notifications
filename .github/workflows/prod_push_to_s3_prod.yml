@@ -20,6 +20,10 @@ jobs:
       with:
         node-version: '22.x'
         cache: 'npm'
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::922311303087:role/github-actions@dpd-rco-notification-map@production 
+        aws-region: us-east-1
 
     - name: npm install, and build
       run: |

@@ -20,6 +20,10 @@ jobs:
       with:
         node-version: '22.x'
         cache: 'npm'
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::922311303087:role/github-actions@dpd-rco-notification-map-dev@main
+        aws-region: us-east-1
 
     - name: npm install, and build
       run: |
@@ -39,7 +43,7 @@ jobs:
     - name: Deploy to Dev s3, Set index headers, and Invalidate Cloudfront
       env:
         AWS_DEFAULT_REGION: 'us-east-1'
-        AWS_S3_BUCKET: vue3-rco-notifications-dev
+        AWS_S3_BUCKET: dpd-rco-notification-map-dev
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |

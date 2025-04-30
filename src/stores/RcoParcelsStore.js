@@ -75,8 +75,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     },
     async fillOpaPropertiesPublic() {
       try {
-        // const opaSet = this.pwdParcelIdsMerged.join("','");
-        if (import.meta.env.VITE_DEBUG) console.log('fillOpaPropertiesPublic is running');
+        // if (import.meta.env.VITE_DEBUG) console.log('fillOpaPropertiesPublic is running');
         const opaSet = this.pwdParcelsMerged.features.map((feature) => feature.properties.PARCEL_ID).join("','");
         if (import.meta.env.VITE_DEBUG) console.log('opaSet:', opaSet);
         const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+pwd_parcel_id+in+(%27${opaSet}%27)`);

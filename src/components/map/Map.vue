@@ -312,16 +312,14 @@ watch(
 watch(
   () => RcoParcelsStore.pwdParcelsMerged,
   async newPwdParcels => {
-    if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newPwdParcels:', newPwdParcels);
-    if (newPwdParcels && map.getSource('pwdParcels')) {
+    // if (import.meta.env.VITE_DEBUG) console.log('Map.vue RcoParcelsStore.rco watch, newPwdParcels:', newPwdParcels);
+    if (newPwdParcels && newPwdParcels.features.length && map.getSource('pwdParcels')) {
       map.getSource('pwdParcels').setData(newPwdParcels);
       const bounds = bbox(buffer(newPwdParcels, 300, {units: 'feet'}));
       map.fitBounds(bounds);
     } else if (map.getSource('pwdParcels')) {
       map.getSource('pwdParcels').setData({ type: 'FeatureCollection', features: [] });
     }
-    // const bounds = bbox(buffer(newPwdParcels, 300, {units: 'feet'}));
-    // map.fitBounds(bounds);
   }
 )
 
@@ -358,7 +356,7 @@ watch(
   () => hoveredStateBuilding.value,
   newHoveredStateId => {
     if (newHoveredStateId) {
-      if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources.pwdParcels.data.features', map.getStyle().sources.pwdParcels.data.features, 'newHoveredStateId:', newHoveredStateId);
+      // if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources.pwdParcels.data.features', map.getStyle().sources.pwdParcels.data.features, 'newHoveredStateId:', newHoveredStateId);
       const feature = map.getStyle().sources.pwdParcels.data.features.filter(feature => {
         // if (import.meta.env.VITE_DEBUG) console.log('feature:', feature)//, 'feature.properties.PARCEL_ID:', feature.properties.PARCEL_ID, 'newHoveredStateId:', newHoveredStateId);
         feature.properties.PARCEL_ID === newHoveredStateId;//[0]
