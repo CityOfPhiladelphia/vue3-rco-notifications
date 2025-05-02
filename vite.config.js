@@ -15,5 +15,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  base: import.meta.env.VITE_PUBLICPATH,
+  base: './rconotifications/',
 })
