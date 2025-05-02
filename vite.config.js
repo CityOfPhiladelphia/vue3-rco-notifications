@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-const baseUrl = import.meta.env.VITE_BASEURL
+// const baseUrl = import.meta.env.VITE_BASEURL
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,6 +17,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  // base: '/devrconotification/',
-  base: baseUrl,
+  base: '/devrconotification/',
+  // base: baseUrl,
 })
