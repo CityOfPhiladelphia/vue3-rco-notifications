@@ -5,7 +5,7 @@ name: prod Push to S3 prod buckets
 on:
   push:
     branches:
-      - production
+      - production_x
 jobs:
   build:
 
