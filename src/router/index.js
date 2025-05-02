@@ -205,7 +205,8 @@ const dataFetch = async(to, from) => {
 
 const router = createRouter({
   // history: createWebHashHistory(import.meta.env.BASE_URL),
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // history: createWebHistory(import.meta.env.VITE_PUBLICPATH),
+  history: createWebHistory(import.meta.env.VITE_BASEURL),
   routes: [
     {
       path: '/:pathMatch(.*)*',
