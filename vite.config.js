@@ -15,5 +15,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  base: './rconotifications/',
+  base: 'https://phila.gov/rconotifications/',
 })
