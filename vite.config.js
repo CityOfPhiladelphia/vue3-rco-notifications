@@ -16,4 +16,5 @@ export default defineConfig({
     }
   },
   // base: '/devrconotification/',
+  base: import.meta.env.VITE_BASEURL,
 })
