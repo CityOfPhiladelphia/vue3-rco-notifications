@@ -58,12 +58,12 @@ const footerLinks = [
     href: '#information',
     text: 'Information',
   },
-  {
-    type: 'native',
-    href: 'https://phila.formstack.com/forms/atlas_feedback_form',
-    text: 'Feedback',
-    target: '_blank',
-  },
+  // {
+  //   type: 'native',
+  //   href: 'https://phila.formstack.com/forms/atlas_feedback_form',
+  //   text: 'Feedback',
+  //   target: '_blank',
+  // },
 ];
 
 const handleWindowResize = () => {
