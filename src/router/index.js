@@ -4,8 +4,6 @@ import $config from '@/config';
 
 import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 import { useParcelsStore } from '@/stores/ParcelsStore.js'
-import { useOpaStore } from '@/stores/OpaStore.js'
-import { useDorStore } from '@/stores/DorStore.js'
 import { useMainStore } from '@/stores/MainStore.js'
 import { useMapStore } from '@/stores/MapStore.js'
 import { useRcoParcelsStore } from '@/stores/RcoParcelsStore';
@@ -29,11 +27,6 @@ const clearStoreData = async() => {
 
   const RcoParcelsStore = useRcoParcelsStore();
   RcoParcelsStore.clearAllPwdParcelsData();
-
-  // const OpaStore = useOpaStore();
-  // OpaStore.clearAllOpaData();
-  // const DorStore = useDorStore();
-  // DorStore.clearAllDorData();
 
   const CondosStore = useCondosStore();
   CondosStore.lastPageUsed = 1;
@@ -204,9 +197,7 @@ const dataFetch = async(to, from) => {
 }
 
 const router = createRouter({
-  // history: createWebHashHistory(import.meta.env.BASE_URL),
-  history: createWebHistory(import.meta.env.VITE_BASEURL),
-  // history: createWebHistory(import.meta.env.VITE_BASEURL),
+  history: createWebHistory(import.meta.env.VITE_PUBLICPATH),
   routes: [
     {
       path: '/:pathMatch(.*)*',
