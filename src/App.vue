@@ -200,7 +200,7 @@ const navLinks2 = {
     },
     {
       type: 'native',
-      href: "https://www.phila.gov/media/20190417143814/RCO-Rights-and-Responsibilities-5.pdf",
+      href: "https://www.phila.gov/media/20240531130803/RCO-Rights-and-Resposibilities.pdf",
       text: "RCO Rights and Responsibilities",
       target: "_blank",
     },
