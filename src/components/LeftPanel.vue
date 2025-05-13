@@ -180,16 +180,11 @@ const exportRcos = () => {
 };
 
 const exportProperties = () => {
-  let csvContent = 'data:text/csv;charset=utf-8,Property, Contact Mailing Address\n';
+  let csvContent = 'data:text/csv;charset=utf-8,ADDRESS, CITY, STATE, ZIP\n';
   let encodedUri = encodeURI(csvContent);
   opaProperties.value.forEach(item => {
     let newCsvContent = '';
-    newCsvContent+=`${item.address_std.replaceAll(',', '').replaceAll('#', '')} Philadelphia PA ${item.zip_code},`;
-    if (item.mailing_care_of) newCsvContent+=`${item.mailing_care_of.replaceAll(',', '').replaceAll('#', '')} `;
-    if (item.mailing_address_1) newCsvContent+=`${item.mailing_address_1.replaceAll(',', '').replaceAll('#', '')} `;
-    if (item.mailing_address_2) newCsvContent+=`${item.mailing_address_2.replaceAll(',', '').replaceAll('#', '')} `;
-    if (item.mailing_street) newCsvContent+=`${item.mailing_street.replaceAll(',', '').replaceAll('#', '')} `;
-    newCsvContent+=`${item.mailing_city_state} ${item.mailing_zip}`;
+    newCsvContent+=`${item.address_std.replaceAll(',', '').replaceAll('#', '')}, Philadelphia, PA, ${item.zip_code},`;
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
     if (import.meta.env.VITE_DEBUG) console.log('newCsvContent:', newCsvContent, 'newEncodedUri:', newEncodedUri);
     encodedUri += newEncodedUri;
