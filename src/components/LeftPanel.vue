@@ -162,12 +162,12 @@ const exportRcos = () => {
   let encodedUri = encodeURI(csvContent);
   rcos.value.forEach(item => {
     let newCsvContent = '';
-    newCsvContent += item.properties.ORGANIZATION_NAME.replaceAll(',', '') + ',';
-    newCsvContent += item.properties.PRIMARY_EMAIL.replaceAll(',', '') + ',';
-    newCsvContent += item.properties.ORGANIZATION_ADDRESS.replaceAll(',', '') + ',';
-    newCsvContent += item.properties.PRIMARY_NAME.replaceAll(',', '') + ',';
-    newCsvContent += item.properties.PRIMARY_ADDRESS.replaceAll(',', '') + ',';
-    newCsvContent += item.properties.PRIMARY_PHONE.replaceAll(',', '');
+    if (item.properties.ORGANIZATION_NAME) newCsvContent += item.properties.ORGANIZATION_NAME.replaceAll(',', '') + ',';
+    if (item.properties.PRIMARY_EMAIL) newCsvContent += item.properties.PRIMARY_EMAIL.replaceAll(',', '') + ',';
+    if (item.properties.ORGANIZATION_ADDRESS) newCsvContent += item.properties.ORGANIZATION_ADDRESS.replaceAll(',', '') + ',';
+    if (item.properties.PRIMARY_NAME) newCsvContent += item.properties.PRIMARY_NAME.replaceAll(',', '') + ',';
+    if (item.properties.PRIMARY_ADDRESS) newCsvContent += item.properties.PRIMARY_ADDRESS.replaceAll(',', '') + ',';
+    if (item.properties.PRIMARY_PHONE) newCsvContent += item.properties.PRIMARY_PHONE.replaceAll(',', '');
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
     encodedUri += newEncodedUri;
   });
@@ -184,7 +184,7 @@ const exportProperties = () => {
   let encodedUri = encodeURI(csvContent);
   opaProperties.value.forEach(item => {
     let newCsvContent = '';
-    newCsvContent+=`${item.address_std.replaceAll(',', '').replaceAll('#', '')}, Philadelphia, PA, ${item.zip_code},`;
+    if (item.address_std) newCsvContent+=`${item.address_std.replaceAll(',', '').replaceAll('#', '')}, Philadelphia, PA, ${item.zip_code},`;
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
     if (import.meta.env.VITE_DEBUG) console.log('newCsvContent:', newCsvContent, 'newEncodedUri:', newEncodedUri);
     encodedUri += newEncodedUri;
