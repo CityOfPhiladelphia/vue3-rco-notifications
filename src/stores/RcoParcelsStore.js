@@ -118,19 +118,24 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         'spatialRel': 'esriSpatialRelIntersects',
       };
       let xyCoords;
+      let xyCoordsReduced = [];
+      
       if (ParcelsStore.pwd.features && ParcelsStore.pwd.features.length > 0) {
         xyCoords = ParcelsStore.pwd.features[0].geometry.coordinates[0];
-        params.geometry = JSON.stringify({ "rings": [xyCoords], "spatialReference": { "wkid": 4326 }});
+        for (let i = 0; i < xyCoords.length; i++) {
+        let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
+        xyCoordsReduced.push(newXyCoordReduced);
+      }
+        params.geometry = JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }});
         params.geometryType = 'esriGeometryPolygon';
       } else if (GeocodeStore.aisData.features && GeocodeStore.aisData.features.length > 0) {
         xyCoords = [GeocodeStore.aisData.features[0].geometry.coordinates];
-        params.geometry = JSON.stringify({ "x": xyCoords[0][0], "y": xyCoords[0][1], "spatialReference": { "wkid": 4326 }});
+        for (let i = 0; i < xyCoords.length; i++) {
+          let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
+          xyCoordsReduced.push(newXyCoordReduced);
+        }
+        params.geometry = JSON.stringify({ "x": xyCoordsReduced[0][0], "y": xyCoordsReduced[0][1], "spatialReference": { "wkid": 4326 }});
         params.geometryType = 'esriGeometryPoint';
-      }
-      let xyCoordsReduced = [];
-      for (let i = 0; i < xyCoords.length; i++) {
-        let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
-        xyCoordsReduced.push(newXyCoordReduced);
       }
 
       if (import.meta.env.VITE_DEBUG) console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
@@ -233,20 +238,27 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       const MapStore = useMapStore();
       const buffer = MapStore.bufferForParcel;
       const xyCoords = buffer.geometry.coordinates[0];
+      if (import.meta.env.VITE_DEBUG) console.log('fillPwdParcelDataByBuffer xyCoords:', xyCoords, 'xyCoords.length:', xyCoords.length);
       // const xyCoordsReduced = xyCoords;
       let xyCoordsReduced = [];
       // let xyCoordsReduced = [[ parseFloat(xyCoords[0][0].toFixed(9)), parseFloat(xyCoords[0][1].toFixed(9)) ]];
       // var i;
 
       for (let i = 0; i < xyCoords.length; i++) {
-        // if (i%3 == 0) {
-          let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
+        let newXyCoordReduced;
+        if (xyCoords.length > 20 && i%3 == 0) {
+          if (import.meta.env.VITE_DEBUG) console.log('i:', i, 'xyCoords.length:', xyCoords.length, 'i%3:', i%3);
+          newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
           xyCoordsReduced.push(newXyCoordReduced);
-        // }
+        } else if (xyCoords.length <= 20) {
+          if (import.meta.env.VITE_DEBUG) console.log('i:', i, 'xyCoords[i]:', xyCoords[i]);
+          newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
+          xyCoordsReduced.push(newXyCoordReduced);
+        }
       }
       // xyCoordsReduced.push([ parseFloat(xyCoords[0][0].toFixed(9)), parseFloat(xyCoords[0][1].toFixed(9)) ]);
 
-      if (import.meta.env.VITE_DEBUG) console.log('fillPwdParcelDataByBuffer MapStore.bufferForParcel.geometry:', MapStore.bufferForParcel.geometry);
+      if (import.meta.env.VITE_DEBUG) console.log('fillPwdParcelDataByBuffer xyCoordsReduced:', xyCoordsReduced, 'MapStore.bufferForParcel.geometry:', MapStore.bufferForParcel.geometry);
       let params = {
         'where': '1=1',
         'outSR': 4326,
