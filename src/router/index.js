@@ -130,7 +130,7 @@ const dataFetch = async(to, from) => {
   MainStore.datafetchRunning = true;
   const GeocodeStore = useGeocodeStore();
   const ParcelsStore = useParcelsStore();
-  const dataSourcesLoadedArray = MainStore.dataSourcesLoadedArray;
+  // const dataSourcesLoadedArray = MainStore.dataSourcesLoadedArray;
   if (to.name === 'not-found') {
     MainStore.datafetchRunning = false;
     return;
