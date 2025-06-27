@@ -170,7 +170,7 @@ const dataFetch = async(to, from) => {
     if (MainStore.lastSearchMethod !== 'mapClick') {
       if (import.meta.env.VITE_DEBUG) console.log('dataFetch, inside if routeAddressChanged:', routeAddressChanged);
       await ParcelsStore.fillPwdParcelData();
-      await ParcelsStore.fillDorParcelData();
+      // await ParcelsStore.fillDorParcelData();
     }
   }
   
