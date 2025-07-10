@@ -10,16 +10,12 @@ export const useParcelsStore = defineStore('ParcelsStore', {
     return {
       pwdChecked: {},
       pwd: {},
-      // dorChecked: {},
-      // dor: {},
     };
   },
   actions: {
     async clearParcels() {
       this.pwdChecked = {};
       this.pwd = {};
-      // this.dorChecked = {};
-      // this.dor = {};
     },
     async fillPwdParcelData() {
       const GeocodeStore = useGeocodeStore();
@@ -45,68 +41,8 @@ export const useParcelsStore = defineStore('ParcelsStore', {
       }
     },
 
-    // async fillDorParcelData() {
-    //   const GeocodeStore = useGeocodeStore();
-    //   const AddressLoaded = GeocodeStore.aisData.features
-    //   if (!AddressLoaded) { return }
-    //   const aisData = AddressLoaded[0];
-    //   const dorParcelId = aisData.properties.dor_parcel_id;
-    //   if (!dorParcelId) {
-    //     if (import.meta.env.VITE_DEBUG) console.log('no dor parcel in AIS')
-    //     await this.checkParcelDataByLngLat(aisData.geometry.coordinates[0], aisData.geometry.coordinates[1], 'dor');
-    //     this.dor = this.dorChecked;
-    //     return;
-    //   }
-
-    //   const url = 'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/DOR_Parcel/FeatureServer/0/query';
-    //   let parcelQuery;
-
-    //   if (dorParcelId.includes('|')) {
-    //     const idSplit = dorParcelId.split('|');
-    //     let queryString = "MAPREG = '";
-    //     let i;
-    //     for (i=0; i<idSplit.length; i++) {
-    //       queryString = queryString + idSplit[i] + "'";
-    //       if (i < idSplit.length - 1) {
-    //         queryString = queryString + " or MAPREG = '";
-    //       }
-    //     }
-
-    //     parcelQuery = url + '?where=' + queryString;
-
-    //   } else if (Array.isArray(dorParcelId)) {
-    //     parcelQuery = url + '?where=MAPREG IN (' + dorParcelId + ')';
-    //   } else {
-    //     parcelQuery = url + "?where=MAPREG='" + dorParcelId + "'";
-    //   }
-
-    //   let params = {
-    //     'outSR': 4326,
-    //     'f': 'geojson',
-    //     'outFields': '*',
-    //     'returnGeometry': true,
-    //   };
-
-    //   try {
-    //     const response = await axios(parcelQuery, { params });
-    //     if (response.status === 200) {
-    //       if (import.meta.env.VITE_DEBUG) console.log('response', response);
-    //       const originalJson = await response.data;
-    //       const processedData = await processParcels(originalJson);
-    //       const MainStore = useMainStore();
-    //       MainStore.selectedParcelId = processedData.features[0].properties.OBJECTID;
-    //       this.dor = processedData;
-    //     } else {
-    //       if (import.meta.env.VITE_DEBUG) console.warn('fillDorParcelData - await resolved but HTTP status was not successful');
-    //     }
-    //   } catch {
-    //     if (import.meta.env.VITE_DEBUG) console.error('fillDorParcelData - await never resolved, failed to fetch parcel data');
-    //   }
-    // },
-
-    async checkParcelDataByLngLat(lng, lat, parcelLayer) {
-      if (import.meta.env.VITE_DEBUG) console.log('checkParcelDataByLngLat, lng:', lng, 'lat:', lat, 'parcelLayer:', parcelLayer);
-      let ESRILayer = parcelLayer === 'pwd' ? 'PWD_PARCELS' : 'DOR_Parcel';
+    async checkParcelDataByLngLat(lng, lat) {
+      // if (import.meta.env.VITE_DEBUG) console.log('checkParcelDataByLngLat, lng:', lng, 'lat:', lat);
       let params = {
         'where': '1=1',
         'outSR': 4326,
@@ -117,30 +53,18 @@ export const useParcelsStore = defineStore('ParcelsStore', {
         'geometryType': 'esriGeometryPoint',
         'spatialRel': 'esriSpatialRelWithin',
       };
-      const MainStore = useMainStore();
       try {
-        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/${ESRILayer}/FeatureServer/0/query`, { params });
+        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('checkParcelDataByLngLat - await resolved but HTTP status was not successful')
         }
         if (response.data.features.length > 0) {
           let data = await response.data;
-          let processedData;
-
-          if (parcelLayer === 'dor') {
-            processedData = await processParcels(data);
-            MainStore.selectedParcelId = processedData.features[0].properties.OBJECTID;
-          } else {
-            processedData = data;
-          }
-          this[`${parcelLayer}Checked`] = processedData;
-        } else {
-          if (import.meta.env.VITE_DEBUG) console.log('in else, parcelLayer:', parcelLayer);
-          this[`${parcelLayer}Checked`] = {};
+          this.pwdChecked = data;
         }
       } catch {
         if (import.meta.env.VITE_DEBUG) console.error(`checkParcelDataByLngLat await never resolved, failed to fetch ${parcelLayer} parcel data by lng/lat`)
-        this[`${parcelLayer}Checked`] = {};
+        this.pwdChecked = {};
       }
     },
   },

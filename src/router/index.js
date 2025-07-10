@@ -10,8 +10,26 @@ import { useRcoParcelsStore } from '@/stores/RcoParcelsStore';
 
 import { useCondosStore } from '@/stores/CondosStore.js'
 
-import useRouting from '@/composables/useRouting';
-const { routeApp } = useRouting();
+
+// might want to rename this because routeApp is vague in that this is all part of routing the app
+const routeApp = (router, route) => {
+  const MainStore = useMainStore();
+  let startQuery = { ...route.query };
+  delete startQuery['address'];
+  delete startQuery['lat'];
+  delete startQuery['lng'];
+
+  // if (import.meta.env.VITE_DEBUG) console.log('routeApp, router:', router, 'route:', route, 'startQuery:', startQuery);
+
+  if (MainStore.currentAddress) {
+    if (import.meta.env.VITE_DEBUG) console.log('routeApp routing to address because MainStore has address');
+    router.push({ name: 'address', params: { address: MainStore.currentAddress }, query: { ...startQuery } });
+  } else {
+    if (import.meta.env.VITE_DEBUG) console.log('routeApp routing to not-found because no address or topic');
+    MainStore.addressSearchRunning = false;
+    router.push({ name: 'not-found', query: { ...startQuery } });
+  }
+}
 
 // this runs on address search and as part of datafetch()
 const clearStoreData = async() => {
@@ -61,32 +79,16 @@ const getParcelsAndPutInStore = async(lng, lat) => {
   if (import.meta.env.VITE_DEBUG) console.log('getParcelsAndPutInStore is running');
   const MainStore = useMainStore();
   const ParcelsStore = useParcelsStore();
-  let parcelLayer = 'pwd';
-  await ParcelsStore.checkParcelDataByLngLat(lng, lat, 'pwd');
-  await ParcelsStore.checkParcelDataByLngLat(lng, lat, 'dor');
-  if (parcelLayer === 'dor' && !Object.keys(ParcelsStore.dorChecked).length) {
-    return;
-  } else if (parcelLayer === 'pwd' && !Object.keys(ParcelsStore.pwdChecked).length) {
+  await ParcelsStore.checkParcelDataByLngLat(lng, lat);
+  if (!Object.keys(ParcelsStore.pwdChecked).length) {
     return;
   }
   ParcelsStore.pwd = ParcelsStore.pwdChecked;
-  ParcelsStore.dor = ParcelsStore.dorChecked;
 
-  // collects 4 things to attempt to geocode from the parcels clicked
-  const otherParcelLayer = parcelLayer === 'pwd' ? 'dor' : 'pwd';
-  const addressField = parcelLayer === 'pwd' ? 'ADDRESS' : 'ADDR_SOURCE';
-  const otherAddressField = otherParcelLayer === 'pwd' ? 'ADDRESS' : 'ADDR_SOURCE';
-  const geocodeParameterField = parcelLayer === 'pwd' ? 'PARCELID' : 'MAPREG';
-  const otherGeocodeParameterField = otherParcelLayer === 'pwd' ? 'PARCELID' : 'MAPREG';
-  
-  // if (import.meta.env.VITE_DEBUG) console.log('parcelLayer:', parcelLayer);
-  if (ParcelsStore[parcelLayer].features) {
-    MainStore.currentParcelAddress = ParcelsStore[parcelLayer].features[0].properties[addressField];
-    MainStore.currentParcelGeocodeParameter = ParcelsStore[parcelLayer].features[0].properties[geocodeParameterField]
-  }
-  if (ParcelsStore[otherParcelLayer].features) {
-    MainStore.otherParcelAddress = ParcelsStore[otherParcelLayer].features[0].properties[otherAddressField];
-    MainStore.otherParcelGeocodeParameter = ParcelsStore[otherParcelLayer].features[0].properties[otherGeocodeParameterField]
+  // maybe this whole if can come out
+  if (ParcelsStore.pwd.features) {
+    MainStore.currentParcelAddress = ParcelsStore.pwd.features[0].properties.ADDRESS;
+    MainStore.currentParcelGeocodeParameter = ParcelsStore.pwd.features[0].properties.PARCELID;
   }
 }
 
@@ -100,25 +102,10 @@ const checkParcelInAis = async() => {
   if (GeocodeStore.aisDataChecked.features) {
     MainStore.currentAddress = GeocodeStore.aisDataChecked.features[0].properties.street_address;
   } else {
-    // if (import.meta.env.VITE_DEBUG) console.log('checkParcelInAis, noAisData currentParcelGeocodeParameter');
-    await GeocodeStore.checkAisData(MainStore.otherParcelGeocodeParameter);
+    await GeocodeStore.checkAisData(MainStore.currentParcelAddress);
     if (GeocodeStore.aisDataChecked.features) {
       MainStore.currentAddress = GeocodeStore.aisDataChecked.features[0].properties.street_address;
-    } else {
-      // if (import.meta.env.VITE_DEBUG) console.log('checkParcelInAis, noAisData otherParcelGeocodeParameter');
-      await GeocodeStore.checkAisData(MainStore.currentParcelAddress);
-      if (GeocodeStore.aisDataChecked.features) {
-        MainStore.currentAddress = GeocodeStore.aisDataChecked.features[0].properties.street_address;
-      } else {
-        // if (import.meta.env.VITE_DEBUG) console.log('checkParcelInAis, noAisData currentParcelAddress');
-        await GeocodeStore.checkAisData(MainStore.otherParcelAddress);
-        if (GeocodeStore.aisDataChecked.features) {
-          MainStore.currentAddress = GeocodeStore.aisDataChecked.features[0].properties.street_address;
-        } else {
-          // if (import.meta.env.VITE_DEBUG) console.log('checkParcelInAis, noAisData otherParcelAddress');
-        }
-      }
-    }
+    } 
   }
 }
 
@@ -231,23 +218,38 @@ const router = createRouter({
         const GeocodeStore = useGeocodeStore();
         const ParcelsStore = useParcelsStore();
         MainStore.addressSearchRunning = true;
+
+        // stops the process if you clicked twice
         if (MainStore.datafetchRunning) {
           return false;
+
+        // an address was searched, so it does this block
         } else if (address && address !== '') {
           if (import.meta.env.VITE_DEBUG) console.log('search route beforeEnter, address:', address);
           MainStore.setLastSearchMethod('address');
           await clearStoreData();
           await getGeocodeAndPutInStore(address);
           routeApp(router, to);
+
+        // the map was clicked, so it does this block
         } else if (lat && lng) {
           MainStore.setLastSearchMethod('mapClick');
           await getParcelsAndPutInStore(lng, lat);
-          if (!Object.keys(ParcelsStore.pwdChecked).length && !Object.keys(ParcelsStore.dorChecked).length) {
+
+          if (!Object.keys(ParcelsStore.pwdChecked).length) {
             MainStore.addressSearchRunning = false;
             return false;
           }
+
+          // if there is a parcel, it checks the parcel in AIS
           await checkParcelInAis();
+
+          // this part is a function that is needed here and somewhere else, so instead of keeping it here in this
+          // file, it is moved to the composable
           routeApp(router, to);
+
+
+        // if there is no address or lat/lng, it does this block
         } else {
           return false;
         }
@@ -267,7 +269,9 @@ router.afterEach(async (to, from) => {
   } else {
     MainStore.showInformation = false;
   }
+
   if (to.name !== 'not-found' && to.name !== 'search' && to.name !== 'home') {
+    
     MainStore.addressSearchRunning = false;
     await dataFetch(to, from);
     let pageTitle = MainStore.appVersion;
