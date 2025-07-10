@@ -3,17 +3,18 @@
 import $config from '@/config';
 if (import.meta.env.VITE_DEBUG) console.log('Map.vue $config:', $config);
 
-import { ref, onMounted, watch, watchEffect, computed } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 
 // PACKAGE IMPORTS
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 // this was recommended by a comment in https://github.com/mapbox/mapbox-gl-js/issues/9114
 // the official mapbox-gl-draw was blocking map clicks
+// Look into updating to the latest version of mapbox-gl-draw
 import '@/assets/mapbox-gl-draw.min.js'
 import '@/assets/maplibre-gl-draw.css';
 import destination from '@turf/destination';
-import { point, polygon, multiPolygon, feature, featureCollection } from '@turf/helpers';
+import { point, polygon, multiPolygon } from '@turf/helpers';
 import bbox from '@turf/bbox';
 import buffer from '@turf/buffer';
 
@@ -357,10 +358,10 @@ watch(
   newHoveredStateId => {
     if (newHoveredStateId) {
       // if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources.pwdParcels.data.features', map.getStyle().sources.pwdParcels.data.features, 'newHoveredStateId:', newHoveredStateId);
-      const feature = map.getStyle().sources.pwdParcels.data.features.filter(feature => {
-        // if (import.meta.env.VITE_DEBUG) console.log('feature:', feature)//, 'feature.properties.PARCEL_ID:', feature.properties.PARCEL_ID, 'newHoveredStateId:', newHoveredStateId);
-        feature.properties.PARCEL_ID === newHoveredStateId;//[0]
-      })[0];
+      // const feature = map.getStyle().sources.pwdParcels.data.features.filter(feature => {
+      //   // if (import.meta.env.VITE_DEBUG) console.log('feature:', feature)//, 'feature.properties.PARCEL_ID:', feature.properties.PARCEL_ID, 'newHoveredStateId:', newHoveredStateId);
+      //   feature.properties.PARCEL_ID === newHoveredStateId;//[0]
+      // })[0];
       // if (import.meta.env.VITE_DEBUG) console.log("map.getSource('pwdParcels'):", map.getSource('pwdParcels'), "map.getStyle().sources.pwdParcels.data:", map.getStyle().sources.pwdParcels.data);
       map.getSource('pwdParcels').setData(map.getStyle().sources.pwdParcels.data);
       // if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources:', map.getStyle().sources.filter(source => source.id === 'pwdParcels')[0]);
