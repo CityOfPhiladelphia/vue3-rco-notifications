@@ -3,7 +3,7 @@
 import $config from '@/config';
 if (import.meta.env.VITE_DEBUG) console.log('Map.vue $config:', $config);
 
-import { ref, onMounted, watch, watchEffect, computed } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 
 // PACKAGE IMPORTS
 import maplibregl from 'maplibre-gl';
@@ -13,7 +13,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '@/assets/mapbox-gl-draw.min.js'
 import '@/assets/maplibre-gl-draw.css';
 import destination from '@turf/destination';
-import { point, polygon, multiPolygon, feature, featureCollection } from '@turf/helpers';
+import { point, polygon, multiPolygon } from '@turf/helpers';
 import bbox from '@turf/bbox';
 import buffer from '@turf/buffer';
 
@@ -28,8 +28,6 @@ import { useParcelsStore } from '@/stores/ParcelsStore.js'
 const ParcelsStore = useParcelsStore();
 import { useRcoParcelsStore } from '@/stores/RcoParcelsStore';
 const RcoParcelsStore = useRcoParcelsStore();
-// import { useCity311Store } from '@/stores/City311Store';
-// const City311Store = useCity311Store();
 
 // ROUTER
 import { useRouter, useRoute } from 'vue-router';
@@ -154,7 +152,6 @@ onMounted(async () => {
     if (e.clickOnLayer) {
       return;
     }
-    // router.push({ name: 'search', query: { lng: e.lngLat.lng, lat: e.lngLat.lat }})
     let drawLayers = map.queryRenderedFeatures(e.point).filter(feature => [ 'mapbox-gl-draw-cold', 'mapbox-gl-draw-hot' ].includes(feature.source));
     // if (import.meta.env.VITE_DEBUG) console.log('Map.vue handleMapClick, e:', e, 'drawLayers:', drawLayers, 'drawMode:', drawMode, 'e:', e, 'map.getStyle():', map.getStyle(), 'MapStore.drawStart:', MapStore.drawStart);
     if (!drawLayers.length && draw.getMode() !== 'draw_polygon') {
@@ -201,7 +198,7 @@ watch(
         map.setZoom(17);
       }
       MapStore.currentAddressCoords = newCoords;
-  
+
       const popup = document.getElementsByClassName('maplibregl-popup');
       if (popup.length) {
         popup[0].remove();
@@ -233,7 +230,6 @@ watch(
 });
 
 // watch dor parcel coordinates for moving dor parcel
-// const selectedParcelId = computed(() => { return MainStore.selectedParcelId; });
 const pwdParcelCoordinates = computed(() => {
   let value;
   // if (import.meta.env.VITE_DEBUG) console.log('computed dorCoordinates, selectedParcelId.value:', selectedParcelId.value, 'ParcelsStore.pwd', ParcelsStore.pwd);
@@ -271,14 +267,12 @@ const imagerySelected = computed(() => {
 })
 
 const toggleImagery = () => {
-  // if (import.meta.env.VITE_DEBUG) console.log('toggleImagery, map.getStyle:', map.getStyle());
   if (!MapStore.imageryOn) {
     MapStore.imageryOn = true;
-    map.addLayer($config.mapLayers[imagerySelected.value], 'cyclomediaRecordings')
-    map.addLayer($config.mapLayers.imageryLabels, 'cyclomediaRecordings')
-    map.addLayer($config.mapLayers.imageryParcelOutlines, 'cyclomediaRecordings')
+    map.addLayer($config.mapLayers[imagerySelected.value], 'pwdParcels')
+    map.addLayer($config.mapLayers.imageryLabels, 'pwdParcels')
+    map.addLayer($config.mapLayers.imageryParcelOutlines, 'pwdParcels')
   } else {
-    if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().layers:', map.getStyle().layers);
     MapStore.imageryOn = false;
     map.removeLayer(imagerySelected.value);
     map.removeLayer('imageryLabels');
@@ -293,14 +287,14 @@ const setImagery = async (newImagery) => {
   }
   // if (import.meta.env.VITE_DEBUG) console.log('setImagery, newImagery:', newImagery, 'oldLayer:', oldLayer, 'imagerySelected.value:', imagerySelected.value);
   MapStore.imagerySelected = newImagery;
-  await map.addLayer($config.mapLayers[imagerySelected.value], 'imageryLabels')
+  map.addLayer($config.mapLayers[imagerySelected.value], 'imageryLabels')
   map.removeLayer(oldLayer);
 }
 
 watch(
   () => MapStore.bufferForParcel,
   async newBuffer => {
-    if (import.meta.env.VITE_DEBUG) console.log('Map.vue bufferForAddressOrLocationOrZipcode watch, newBuffer:', newBuffer);
+    // if (import.meta.env.VITE_DEBUG) console.log('Map.vue bufferForAddressOrLocationOrZipcode watch, newBuffer:', newBuffer);
     if (newBuffer && map.getSource('buffer')) {
       map.getSource('buffer').setData(newBuffer);
     } else if (map.getSource('buffer')) {
@@ -330,23 +324,6 @@ watch(
   newClickedParcelRow => {
     if (import.meta.env.VITE_DEBUG) console.log('Map.vue clickedRow watch, newClickedRow:', newClickedParcelRow, 'newClickedParcelRow.type:', newClickedParcelRow.type);
     if (newClickedParcelRow) map.flyTo({ center: newClickedParcelRow });
-    // let idField, infoField, row;
-    
-    // idField = NearbyActivityStore.dataFields[newClickedParcelRow.type].id_field;
-    // infoField = NearbyActivityStore.dataFields[newClickedParcelRow.type].info_field;
-    // row = NearbyActivityStore[newClickedParcelRow.type].rows.filter(row => row[idField] === newClickedParcelRow.id)[0];
-
-    // if (import.meta.env.VITE_DEBUG) console.log('nearby click, newClickedParcelRow:', newClickedParcelRow, 'idField:', idField, 'row:', row);
-    // if (row.properties) row[infoField] = row.properties[infoField];
-    // const popup = document.getElementsByClassName('maplibregl-popup');
-    // if (popup.length) {
-    //   popup[0].remove();
-    // }
-    // new maplibregl.Popup({ className: 'my-class' })
-    //   .setLngLat(newClickedParcelRow.lngLat)
-    //   .setHTML(row[infoField] || row.properties[infoField])
-    //   .setMaxWidth("300px")
-    //   .addTo(map);
   }
 );
 
@@ -356,14 +333,7 @@ watch(
   () => hoveredStateBuilding.value,
   newHoveredStateId => {
     if (newHoveredStateId) {
-      // if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources.pwdParcels.data.features', map.getStyle().sources.pwdParcels.data.features, 'newHoveredStateId:', newHoveredStateId);
-      const feature = map.getStyle().sources.pwdParcels.data.features.filter(feature => {
-        // if (import.meta.env.VITE_DEBUG) console.log('feature:', feature)//, 'feature.properties.PARCEL_ID:', feature.properties.PARCEL_ID, 'newHoveredStateId:', newHoveredStateId);
-        feature.properties.PARCEL_ID === newHoveredStateId;//[0]
-      })[0];
-      // if (import.meta.env.VITE_DEBUG) console.log("map.getSource('pwdParcels'):", map.getSource('pwdParcels'), "map.getStyle().sources.pwdParcels.data:", map.getStyle().sources.pwdParcels.data);
       map.getSource('pwdParcels').setData(map.getStyle().sources.pwdParcels.data);
-      // if (import.meta.env.VITE_DEBUG) console.log('map.getStyle().sources:', map.getStyle().sources.filter(source => source.id === 'pwdParcels')[0]);
       map.setPaintProperty(
         'pwdParcelsLine',
         'line-color',
@@ -375,7 +345,7 @@ watch(
         ],
       )
       map.setPaintProperty(
-        'pwdParcelsLine', 
+        'pwdParcelsLine',
         'line-width',
         ['match',
         ['get', 'PARCEL_ID'],
@@ -385,7 +355,7 @@ watch(
       ]
       )
       map.setPaintProperty(
-        'pwdParcels', 
+        'pwdParcels',
         'fill-color',
         ['match',
         ['get', 'PARCEL_ID'],
@@ -401,13 +371,13 @@ watch(
         '#575757',
       )
       map.setPaintProperty(
-        'pwdParcelsLine', 
+        'pwdParcelsLine',
         'line-width',
         1.5,
       )
       map.setPaintProperty(
-        'pwdParcels', 
-        'fill-color', 
+        'pwdParcels',
+        'fill-color',
         '#e68c6c',
       );
     }
@@ -418,19 +388,19 @@ watch(
 const distanceMeasureControlRef = ref(null)
 
 const drawCreate = (e) => {
-  if (import.meta.env.VITE_DEBUG) console.log('drawCreate is running, e', e);
+  // if (import.meta.env.VITE_DEBUG) console.log('drawCreate is running, e', e);
   distanceMeasureControlRef.value.getDrawDistances(e);
 }
 const drawUpdate = (e) => {
-  if (import.meta.env.VITE_DEBUG) console.log('drawUpdate is running, e:', e);
+  // if (import.meta.env.VITE_DEBUG) console.log('drawUpdate is running, e:', e);
   distanceMeasureControlRef.value.getDrawDistances(e);
 }
 const drawSelectionChange = (e) => {
-  if (import.meta.env.VITE_DEBUG) console.log('drawSelectionChange is running, e:', e);
+  // if (import.meta.env.VITE_DEBUG) console.log('drawSelectionChange is running, e:', e);
   distanceMeasureControlRef.value.handleDrawSelectionChange(e);
 }
 const drawModeChange = (e) => {
-  if (import.meta.env.VITE_DEBUG) console.log('drawModeChange is running, e', e);
+  // if (import.meta.env.VITE_DEBUG) console.log('drawModeChange is running, e', e);
   if (e.mode === 'draw_polygon') {
     map.getCanvas().style.cursor = 'crosshair';
   } else {
@@ -439,15 +409,14 @@ const drawModeChange = (e) => {
   distanceMeasureControlRef.value.handleDrawModeChange(e);
 }
 const drawDelete = (e) => {
-  if (import.meta.env.VITE_DEBUG) console.log('drawDelete is running, e:', e);
-  // distanceMeasureControlRef.value.handleDrawDelete(e);
+  // if (import.meta.env.VITE_DEBUG) console.log('drawDelete is running, e:', e);
   if (map.getSource(e)) {
     map.getSource(e).setData({ type: 'FeatureCollection', features: [] });
   }
 }
 
 const drawCancel = (e) => {
-  if (import.meta.env.VITE_DEBUG) console.log('drawCancel is running e:', e);
+  // if (import.meta.env.VITE_DEBUG) console.log('drawCancel is running e:', e);
   if (map.getSource(e)) {
     map.getSource(e).setData({ type: 'FeatureCollection', features: [] });
   }
@@ -465,7 +434,7 @@ watch(
 )
 
 const setLabelLayers = (newLabelLayers) => {
-  if (import.meta.env.VITE_DEBUG) console.log('Map.vue setLabelLayers, newLabelLayers:', newLabelLayers, 'map.getStyle().layers:', map.getStyle().layers);
+  // if (import.meta.env.VITE_DEBUG) console.log('Map.vue setLabelLayers, newLabelLayers:', newLabelLayers, 'map.getStyle().layers:', map.getStyle().layers);
   if (newLabelLayers.length) {
     newLabelLayers.forEach(layer => {
       if (!map.getSource(layer.id)) {
@@ -534,7 +503,7 @@ const turnOnCyclomedia = async() => {
   }
 }
 
-// an object class called CyclomediaRecordingsClient is used for adding the cyclomedia recordings circles to the map 
+// an object class called CyclomediaRecordingsClient is used for adding the cyclomedia recordings circles to the map
 let cyclomediaRecordingsClient = new CyclomediaRecordingsClient(
   'https://atlasapi.cyclomedia.com/api/recording/wfs',
   import.meta.env.VITE_CYCLOMEDIA_USERNAME,
@@ -577,11 +546,11 @@ const updateCyclomediaRecordings = async () => {
 
 // everything for adding, moving, and orienting the cyclomedia camera icon and viewcone
 const updateCyclomediaCameraLngLat = (lngLat) => {
-  if (import.meta.env.VITE_DEBUG) console.log('Map.vue cyclo updateCyclomediaCameraLngLat is running 1, lngLat:', lngLat);
+  // if (import.meta.env.VITE_DEBUG) console.log('Map.vue cyclo updateCyclomediaCameraLngLat is running 1, lngLat:', lngLat);
   if (!MapStore.cyclomediaOn) {
     return;
   } else {
-    if (import.meta.env.VITE_DEBUG) console.log('Map.vue cyclo updateCyclomediaCameraLngLat is running 2, lngLat:', lngLat);
+    // if (import.meta.env.VITE_DEBUG) console.log('Map.vue cyclo updateCyclomediaCameraLngLat is running 2, lngLat:', lngLat);
     const theData = point(lngLat);
     map.getSource('cyclomediaCamera').setData(theData);
     $config.dorDrawnMapStyle.sources.cyclomediaCamera.data = theData;
@@ -632,10 +601,10 @@ const updateCyclomediaCameraViewcone = (cycloHFov, cycloYaw) => {
   const cyclomediaCameraLngLat = MapStore.cyclomediaCameraLngLat;
   let options = { units: 'feet' };
   if (!cyclomediaCameraLngLat) {
-    if (import.meta.env.VITE_DEBUG) console.log('no cyclomediaCameraLngLat');
+    // if (import.meta.env.VITE_DEBUG) console.log('no cyclomediaCameraLngLat');
     return;
   }
-  if (import.meta.env.VITE_DEBUG) console.log('cyclomediaCameraLngLat:', cyclomediaCameraLngLat);
+  // if (import.meta.env.VITE_DEBUG) console.log('cyclomediaCameraLngLat:', cyclomediaCameraLngLat);
 
   var destination1 = destination([ cyclomediaCameraLngLat[0], cyclomediaCameraLngLat[1] ], distance, angle1, options);
   var destination2 = destination([ cyclomediaCameraLngLat[0], cyclomediaCameraLngLat[1] ], distance, angle2, options);
@@ -657,7 +626,7 @@ const updateCyclomediaCameraViewcone = (cycloHFov, cycloYaw) => {
 }
 
 const turnOnEagleview = () => {
-  if (import.meta.env.VITE_DEBUG) console.log('turnOnEagleview');
+  // if (import.meta.env.VITE_DEBUG) console.log('turnOnEagleview');
   MapStore.cyclomediaOn = false;
   removeAllCyclomediaMapLayers();
   MapStore.eagleviewOn = true;
@@ -692,8 +661,8 @@ const turnOnEagleview = () => {
     <!-- the distance measure control uses a ref, so that functions within the component can be called from this file -->
     <DistanceMeasureControl
       ref="distanceMeasureControlRef"
-      @drawDelete="drawDelete"
-      @drawCancel="drawCancel"
+      @draw-delete="drawDelete"
+      @draw-cancel="drawCancel"
     />
   </div>
   <KeepAlive>
