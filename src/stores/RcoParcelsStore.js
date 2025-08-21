@@ -76,7 +76,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     async fillOpaPropertiesPublic() {
       try {
         // if (import.meta.env.VITE_DEBUG) console.log('fillOpaPropertiesPublic is running');
-        const opaSet = this.pwdParcelsMerged.features.map((feature) => feature.properties.PARCEL_ID).join("','");
+        const opaSet = this.pwdParcelsMerged.features.map((feature) => feature.properties.parcel_id).join("','");
         if (import.meta.env.VITE_DEBUG) console.log('opaSet:', opaSet);
         const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+pwd_parcel_id+in+(%27${opaSet}%27)`);
         // const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+parcel_number+in+(%27${opaSet}%27)`);
@@ -206,7 +206,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       const blockPwd = block.features.filter((feature) => feature.properties.pwd_parcel_id);
       const parcelIds = blockPwd.map((feature) => feature.properties.pwd_parcel_id).join("','");
       let params = {
-        'where': `PARCEL_ID in ('${parcelIds}')`,
+        'where': `parcel_id in ('${parcelIds}')`,
         'outSR': 4326,
         'f': 'geojson',
         'outFields': '*',
@@ -215,7 +215,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       };
       if (import.meta.env.VITE_DEBUG) console.log('parcelIds:', parcelIds);
       try {
-        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
+        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS_TEST/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelDataByBlock - await resolved but HTTP status was not successful')
         }
@@ -273,7 +273,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       };
       const MainStore = useMainStore();
       try {
-        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
+        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS_TEST/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelDataByBuffer - await resolved but HTTP status was not successful')
         }

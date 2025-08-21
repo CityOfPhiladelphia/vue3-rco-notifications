@@ -34,7 +34,7 @@ export const useParcelsStore = defineStore('ParcelsStore', {
         return;
       }
       try {
-        const response = await fetch(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query?where=PARCELID=%27${pwdParcelNumber}%27&outSR=4326&f=geojson&outFields=*&returnGeometry=true`);
+        const response = await fetch(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS_TEST/FeatureServer/0/query?where=parcelid=%27${pwdParcelNumber}%27&outSR=4326&f=geojson&outFields=*&returnGeometry=true`);
         if (response.ok) {
           this.pwd = await response.json()
         } else {
@@ -63,21 +63,21 @@ export const useParcelsStore = defineStore('ParcelsStore', {
 
       if (dorParcelId.includes('|')) {
         const idSplit = dorParcelId.split('|');
-        let queryString = "MAPREG = '";
+        let queryString = "mapreg = '";
         let i;
         for (i=0; i<idSplit.length; i++) {
           queryString = queryString + idSplit[i] + "'";
           if (i < idSplit.length - 1) {
-            queryString = queryString + " or MAPREG = '";
+            queryString = queryString + " or mapreg = '";
           }
         }
 
         parcelQuery = url + '?where=' + queryString;
 
       } else if (Array.isArray(dorParcelId)) {
-        parcelQuery = url + '?where=MAPREG IN (' + dorParcelId + ')';
+        parcelQuery = url + '?where=mapreg IN (' + dorParcelId + ')';
       } else {
-        parcelQuery = url + "?where=MAPREG='" + dorParcelId + "'";
+        parcelQuery = url + "?where=mapreg='" + dorParcelId + "'";
       }
 
       let params = {
@@ -94,7 +94,7 @@ export const useParcelsStore = defineStore('ParcelsStore', {
           const originalJson = await response.data;
           const processedData = await processParcels(originalJson);
           const MainStore = useMainStore();
-          MainStore.selectedParcelId = processedData.features[0].properties.OBJECTID;
+          MainStore.selectedParcelId = processedData.features[0].properties.objectid;
           this.dor = processedData;
         } else {
           if (import.meta.env.VITE_DEBUG) console.warn('fillDorParcelData - await resolved but HTTP status was not successful');
@@ -129,7 +129,7 @@ export const useParcelsStore = defineStore('ParcelsStore', {
 
           if (parcelLayer === 'dor') {
             processedData = await processParcels(data);
-            MainStore.selectedParcelId = processedData.features[0].properties.OBJECTID;
+            MainStore.selectedParcelId = processedData.features[0].properties.objectid;
           } else {
             processedData = data;
           }
