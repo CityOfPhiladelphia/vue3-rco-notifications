@@ -74,10 +74,10 @@ const getParcelsAndPutInStore = async(lng, lat) => {
 
   // collects 4 things to attempt to geocode from the parcels clicked
   const otherParcelLayer = parcelLayer === 'pwd' ? 'dor' : 'pwd';
-  const addressField = parcelLayer === 'pwd' ? 'ADDRESS' : 'ADDR_SOURCE';
-  const otherAddressField = otherParcelLayer === 'pwd' ? 'ADDRESS' : 'ADDR_SOURCE';
-  const geocodeParameterField = parcelLayer === 'pwd' ? 'PARCELID' : 'MAPREG';
-  const otherGeocodeParameterField = otherParcelLayer === 'pwd' ? 'PARCELID' : 'MAPREG';
+  const addressField = parcelLayer === 'pwd' ? 'address' : 'addr_source';
+  const otherAddressField = otherParcelLayer === 'pwd' ? 'address' : 'addr_source';
+  const geocodeParameterField = parcelLayer === 'pwd' ? 'parcelid' : 'mapreg';
+  const otherGeocodeParameterField = otherParcelLayer === 'pwd' ? 'parcelid' : 'mapreg';
   
   // if (import.meta.env.VITE_DEBUG) console.log('parcelLayer:', parcelLayer);
   if (ParcelsStore[parcelLayer].features) {
