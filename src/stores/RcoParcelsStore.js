@@ -215,7 +215,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       };
       if (import.meta.env.VITE_DEBUG) console.log('parcelIds:', parcelIds);
       try {
-        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS_TEST/FeatureServer/0/query`, { params });
+        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelDataByBlock - await resolved but HTTP status was not successful')
         }
@@ -273,7 +273,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       };
       const MainStore = useMainStore();
       try {
-        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS_TEST/FeatureServer/0/query`, { params });
+        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelDataByBuffer - await resolved but HTTP status was not successful')
         }
