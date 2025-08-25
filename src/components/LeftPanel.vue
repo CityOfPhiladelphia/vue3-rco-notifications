@@ -37,10 +37,10 @@ const hoveredStateBuilding = computed(() => { return MainStore.hoveredStateBuild
 
 // RCOs
 const rcosCompareFn = (a, b) => {
-  if (a.ORGANIZATION_NAME < b.ORGANIZATION_NAME) {
+  if (a.organization_name < b.organization_name) {
     return -1;
   }
-  if (a.ORGANIZATION_NAME > b.ORGANIZATION_NAME) {
+  if (a.organization_name > b.organization_name) {
     return 1;
   }
   return 0;
@@ -49,7 +49,7 @@ const rcos = computed(() => { if (RcoParcelsStore.rcos.features) return [ ...Rco
 const rcosLength = computed(() => rcos.value && rcos.value.length ? rcos.value.length : 0);
 const rcoNames = computed(() => {
   if (rcos.value && rcos.value.length) {
-    return rcos.value.map(item => item.properties.ORGANIZATION_NAME).join(', ');
+    return rcos.value.map(item => item.properties.organization_name).join(', ');
   }
   return '';
 });
@@ -77,7 +77,7 @@ const rcosTableData = computed(() => {
       },
       {
         label: 'Meeting Address',
-        field: 'properties.MEETING_LOCATION_ADDRESS',
+        field: 'properties.meeting_location_address',
       },
       {
         label: 'Primary Contact',
@@ -86,7 +86,7 @@ const rcosTableData = computed(() => {
       },
       {
         label: 'Preferred Method',
-        field: 'properties.PREFFERED_CONTACT_METHOD',
+        field: 'properties.preffered_contact_method',
       },
     ],
     rows: rcos.value || [],
@@ -162,12 +162,17 @@ const exportRcos = () => {
   let encodedUri = encodeURI(csvContent);
   rcos.value.forEach(item => {
     let newCsvContent = '';
-    if (item.properties.ORGANIZATION_NAME) newCsvContent += item.properties.ORGANIZATION_NAME.replaceAll(',', '') + ',';
-    if (item.properties.PRIMARY_EMAIL) newCsvContent += item.properties.PRIMARY_EMAIL.replaceAll(',', '') + ',';
-    if (item.properties.ORGANIZATION_ADDRESS) newCsvContent += item.properties.ORGANIZATION_ADDRESS.replaceAll(',', '') + ',';
-    if (item.properties.PRIMARY_NAME) newCsvContent += item.properties.PRIMARY_NAME.replaceAll(',', '') + ',';
-    if (item.properties.PRIMARY_ADDRESS) newCsvContent += item.properties.PRIMARY_ADDRESS.replaceAll(',', '') + ',';
-    if (item.properties.PRIMARY_PHONE) newCsvContent += item.properties.PRIMARY_PHONE.replaceAll(',', '');
+    if (item.properties.organization_name) newCsvContent += item.properties.organization_name.replaceAll(',', '');
+    newCsvContent += ',';
+    if (item.properties.primary_email) newCsvContent += item.properties.primary_email.replaceAll(',', '');
+    newCsvContent += ',';
+    if (item.properties.organization_address) newCsvContent += item.properties.organization_address.replaceAll(',', '');
+    newCsvContent += ',';
+    if (item.properties.primary_name) newCsvContent += item.properties.primary_name.replaceAll(',', '');
+    newCsvContent += ',';
+    if (item.properties.primary_address) newCsvContent += item.properties.primary_address.replaceAll(',', '');
+    newCsvContent += ',';
+    if (item.properties.primary_phone) newCsvContent += item.properties.primary_phone.replaceAll(',', '');
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
     encodedUri += newEncodedUri;
   });
@@ -296,7 +301,7 @@ watch(
           :rows="rcosTableData.rows"
           :pagination-options="rcosPaginationOptions"
           style-class="table rco-table"
-          @row-click="handleRcoRowClick($event, 'ORGANIZATION_NAME', 'RCO')"
+          @row-click="handleRcoRowClick($event, 'organization_name', 'RCO')"
         >
           <template #emptystate>
             <div v-if="RcoParcelsStore.loadingRcos">
