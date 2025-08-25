@@ -92,7 +92,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
             if (item.mailing_address_1) item.mail_contact+=`${item.mailing_address_1}<br>`;
             if (item.mailing_address_2) item.mail_contact+=`${item.mailing_address_2}<br>`;
             if (item.mailing_street) item.mail_contact += `${item.mailing_street}<br>`;
-            item.mail_contact += `${item.mailing_city_state} ${item.mailing_zip}`;//  ${phoneNumber(item.properties.PRIMARY_PHONE)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
+            item.mail_contact += `${item.mailing_city_state} ${item.mailing_zip}`;//  ${phoneNumber(item.properties.primary_phone)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
           });
           this.opaPropertiesPublic = data;
           this.loadingOpaPropertiesPublic = false;
@@ -149,10 +149,10 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           let data = await response.data;
 
           data.features.sort((a, b) => {
-            if (a.properties.ORGANIZATION_NAME < b.properties.ORGANIZATION_NAME) {
+            if (a.properties.organization_name < b.properties.organization_name) {
               return -1;
             }
-            if (a.properties.ORGANIZATION_NAME > b.properties.ORGANIZATION_NAME) {
+            if (a.properties.organization_name > b.properties.organization_name) {
               return 1;
             }
             return 0;
@@ -160,12 +160,12 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           // if (import.meta.env.VITE_DEBUG) console.log('data:', data);
           data.features.forEach(item => {
             // if (import.meta.env.VITE_DEBUG) console.log('item:', item);
-            item.properties.rco = `<b>${item.properties.ORGANIZATION_NAME}</b><br>${item.properties.ORGANIZATION_ADDRESS}`;
-            item.properties.contact = `${rcoPrimaryContact(item.properties.PRIMARY_NAME)}<br>${phoneNumber(item.properties.PRIMARY_PHONE)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
-            if (item.properties.MEETING_LOCATION_ADDRESS && item.properties.MEETING_LOCATION_ADDRESS.includes('Virtual: ')) {
-              item.properties.meeting_address = item.properties.MEETING_LOCATION_ADDRESS.split('Virtual: ')[0] + `Virtual: <a target="_blank" href="${item.properties.MEETING_LOCATION_ADDRESS.split('Virtual: ')[1]}">${item.properties.MEETING_LOCATION_ADDRESS.split('Virtual: ')[1]}</a>`;
+            item.properties.rco = `<b>${item.properties.organization_name}</b><br>${item.properties.organization_address}`;
+            item.properties.contact = `${rcoPrimaryContact(item.properties.primary_name)}<br>${phoneNumber(item.properties.primary_phone)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
+            if (item.properties.meeting_location_address && item.properties.meeting_location_address.includes('Virtual: ')) {
+              item.properties.meeting_address = item.properties.meeting_location_address.split('Virtual: ')[0] + `Virtual: <a target="_blank" href="${item.properties.meeting_location_address.split('Virtual: ')[1]}">${item.properties.meeting_location_address.split('Virtual: ')[1]}</a>`;
             } else {
-              item.properties.meeting_address = item.properties.MEETING_LOCATION_ADDRESS;
+              item.properties.meeting_address = item.properties.meeting_location_address;
             }
 
           })
