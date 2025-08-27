@@ -92,7 +92,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
             if (item.mailing_address_1) item.mail_contact+=`${item.mailing_address_1}<br>`;
             if (item.mailing_address_2) item.mail_contact+=`${item.mailing_address_2}<br>`;
             if (item.mailing_street) item.mail_contact += `${item.mailing_street}<br>`;
-            item.mail_contact += `${item.mailing_city_state} ${item.mailing_zip}`;//  ${phoneNumber(item.properties.primary_phone)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
+            item.mail_contact += `${item.mailing_city_state} ${item.mailing_zip}`;//  ${phoneNumber(item.properties.primary_phone)}<br><a target='_blank' href='mailto:${item.properties.primary_email}'>${item.properties.primary_email}</a>`;
           });
           this.opaPropertiesPublic = data;
           this.loadingOpaPropertiesPublic = false;
@@ -161,7 +161,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           data.features.forEach(item => {
             // if (import.meta.env.VITE_DEBUG) console.log('item:', item);
             item.properties.rco = `<b>${item.properties.organization_name}</b><br>${item.properties.organization_address}`;
-            item.properties.contact = `${rcoPrimaryContact(item.properties.primary_name)}<br>${phoneNumber(item.properties.primary_phone)}<br><a target='_blank' href='mailto:${item.properties.PRIMARY_EMAIL}'>${item.properties.PRIMARY_EMAIL}</a>`;
+            item.properties.contact = `${rcoPrimaryContact(item.properties.primary_name)}<br>${phoneNumber(item.properties.primary_phone)}<br><a target='_blank' href='mailto:${item.properties.primary_email}'>${item.properties.primary_email}</a>`;
             if (item.properties.meeting_location_address && item.properties.meeting_location_address.includes('Virtual: ')) {
               item.properties.meeting_address = item.properties.meeting_location_address.split('Virtual: ')[0] + `Virtual: <a target="_blank" href="${item.properties.meeting_location_address.split('Virtual: ')[1]}">${item.properties.meeting_location_address.split('Virtual: ')[1]}</a>`;
             } else {
