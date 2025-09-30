@@ -167,7 +167,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
             } else {
               item.properties.meeting_address = item.properties.meeting_location_address;
             }
-
+            item.properties.website_link = item.properties.websites ? `<a target='_blank' href='${item.properties.websites}'>${item.properties.websites}</a>` : 'No website provided';
           })
           this.rcos = data;
           this.loadingRcos = false;

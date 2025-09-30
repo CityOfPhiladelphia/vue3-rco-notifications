@@ -85,8 +85,9 @@ const rcosTableData = computed(() => {
         html: true,
       },
       {
-        label: 'Preferred Method',
-        field: 'properties.preffered_contact_method',
+        label: 'RCO Website',
+        field: 'properties.website_link',
+        html: true,
       },
     ],
     rows: rcos.value || [],
