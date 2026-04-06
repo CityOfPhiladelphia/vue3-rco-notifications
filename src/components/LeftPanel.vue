@@ -163,17 +163,17 @@ const exportRcos = () => {
   let encodedUri = encodeURI(csvContent);
   rcos.value.forEach(item => {
     let newCsvContent = '';
-    if (item.properties.organization_name) newCsvContent += item.properties.organization_name.replaceAll(',', '');
+    if (item.properties.organization_name) newCsvContent += item.properties.organization_name.replaceAll(',', '').replaceAll('#', '');
     newCsvContent += ',';
-    if (item.properties.primary_email) newCsvContent += item.properties.primary_email.replaceAll(',', '');
+    if (item.properties.primary_email) newCsvContent += item.properties.primary_email.replaceAll(',', '').replaceAll('#', '');
     newCsvContent += ',';
-    if (item.properties.organization_address) newCsvContent += item.properties.organization_address.replaceAll(',', '');
+    if (item.properties.organization_address) newCsvContent += item.properties.organization_address.replaceAll(',', '').replaceAll('#', '');
     newCsvContent += ',';
-    if (item.properties.primary_name) newCsvContent += item.properties.primary_name.replaceAll(',', '');
+    if (item.properties.primary_name) newCsvContent += item.properties.primary_name.replaceAll(',', '').replaceAll('#', '');
     newCsvContent += ',';
-    if (item.properties.primary_address) newCsvContent += item.properties.primary_address.replaceAll(',', '');
+    if (item.properties.primary_address) newCsvContent += item.properties.primary_address.replaceAll(',', '').replaceAll('#', '');
     newCsvContent += ',';
-    if (item.properties.primary_phone) newCsvContent += item.properties.primary_phone.replaceAll(',', '');
+    if (item.properties.primary_phone) newCsvContent += item.properties.primary_phone.replaceAll(',', '').replaceAll('#', '');
     let newEncodedUri = encodeURI(newCsvContent).replaceAll('%0D', ' ').replaceAll('%0A', '') + '%0D';
     encodedUri += newEncodedUri;
   });
