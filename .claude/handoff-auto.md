@@ -1,16 +1,14 @@
 # Auto Handoff Snapshot
-*Created: 2026-04-06T13:23:47-04:00*
+*Created: 2026-04-06T13:24:14-04:00*
 *Project: vue3-rco-notifications*
-*Commit: 6809cb5*
+*Commit: 472565d*
 
 ## Last Commit
-fixes issue with csv export
+adds auto-handoff file
 
 ## Files Changed
 ```
-.claude/handoff.md
-CLAUDE.md
-src/components/LeftPanel.vue
+.claude/handoff-auto.md
 ```
 
 ## Context
