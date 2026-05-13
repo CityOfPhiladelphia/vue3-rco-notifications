@@ -5,7 +5,7 @@ name: dev Push to S3 dev bucket
 on:
   push:
     branches:
-      - main_x
+      - fix/large-polygon-queries
 jobs:
   build:
 
