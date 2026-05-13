@@ -141,7 +141,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       if (import.meta.env.VITE_DEBUG) console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
       const MainStore = useMainStore();
       try {
-        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/Zoning_RCO/FeatureServer/0/query`, { params });
+        const response = await axios.post(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/Zoning_RCO/FeatureServer/0/query`, new URLSearchParams(params));
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('fillRcoDataByParcelBounds - await resolved but HTTP status was not successful')
         }
@@ -177,7 +177,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           this.loadingRcos = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG) console.error(`fillRcoDataByParcelBounds await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        console.error(`fillRcoDataByParcelBounds await never resolved, failed to fetch pwd parcel data by lng/lat`)
         this.rcos = {};
         this.loadingRcos = false;
       }
@@ -273,7 +273,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
       };
       const MainStore = useMainStore();
       try {
-        const response = await axios(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, { params });
+        const response = await axios.post(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query`, new URLSearchParams(params));
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelDataByBuffer - await resolved but HTTP status was not successful')
         }
@@ -287,7 +287,7 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
           this.loadingPwdParcelsByBuffer = false;
         }
       } catch {
-        if (import.meta.env.VITE_DEBUG) console.error(`fillPwdParcelDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
+        console.error(`fillPwdParcelDataByBuffer await never resolved, failed to fetch pwd parcel data by lng/lat`)
         this.pwdParcelsByBuffer = {};
         this.loadingPwdParcelsByBuffer = false;
       }
