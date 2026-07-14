@@ -117,30 +117,28 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
         'returnGeometry': true,
         'spatialRel': 'esriSpatialRelIntersects',
       };
-      let xyCoords;
-      let xyCoordsReduced = [];
-      
-      if (ParcelsStore.pwd.features && ParcelsStore.pwd.features.length > 0) {
-        xyCoords = ParcelsStore.pwd.features[0].geometry.coordinates[0];
-        for (let i = 0; i < xyCoords.length; i++) {
-        let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
-        xyCoordsReduced.push(newXyCoordReduced);
-      }
-        params.geometry = JSON.stringify({ "rings": [xyCoordsReduced], "spatialReference": { "wkid": 4326 }});
-        params.geometryType = 'esriGeometryPolygon';
-      } else if (GeocodeStore.aisData.features && GeocodeStore.aisData.features.length > 0) {
-        xyCoords = [GeocodeStore.aisData.features[0].geometry.coordinates];
-        for (let i = 0; i < xyCoords.length; i++) {
-          let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
-          xyCoordsReduced.push(newXyCoordReduced);
-        }
-        params.geometry = JSON.stringify({ "x": xyCoordsReduced[0][0], "y": xyCoordsReduced[0][1], "spatialReference": { "wkid": 4326 }});
-        params.geometryType = 'esriGeometryPoint';
-      }
-
-      if (import.meta.env.VITE_DEBUG) console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
       const MainStore = useMainStore();
       try {
+        let xyCoords;
+        let xyCoordsReduced = [];
+
+        if (ParcelsStore.pwd.features && ParcelsStore.pwd.features.length > 0) {
+          const geometry = ParcelsStore.pwd.features[0].geometry;
+          const rings = geometry.type === 'MultiPolygon' ? geometry.coordinates.flat() : geometry.coordinates;
+          const reducedRings = rings.map((ring) => ring.map((coord) => [ parseFloat(coord[0].toFixed(6)), parseFloat(coord[1].toFixed(6)) ]));
+          params.geometry = JSON.stringify({ "rings": reducedRings, "spatialReference": { "wkid": 4326 }});
+          params.geometryType = 'esriGeometryPolygon';
+        } else if (GeocodeStore.aisData.features && GeocodeStore.aisData.features.length > 0) {
+          xyCoords = [GeocodeStore.aisData.features[0].geometry.coordinates];
+          for (let i = 0; i < xyCoords.length; i++) {
+            let newXyCoordReduced = [ parseFloat(xyCoords[i][0].toFixed(6)), parseFloat(xyCoords[i][1].toFixed(6)) ];
+            xyCoordsReduced.push(newXyCoordReduced);
+          }
+          params.geometry = JSON.stringify({ "x": xyCoordsReduced[0][0], "y": xyCoordsReduced[0][1], "spatialReference": { "wkid": 4326 }});
+          params.geometryType = 'esriGeometryPoint';
+        }
+
+        if (import.meta.env.VITE_DEBUG) console.log('fillRcoDataByParcelBounds, xyCoordsReduced:', xyCoordsReduced);
         const response = await axios.post(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/Zoning_RCO/FeatureServer/0/query`, new URLSearchParams(params));
         if (response.status !== 200) {
           if (import.meta.env.VITE_DEBUG) console.warn('fillRcoDataByParcelBounds - await resolved but HTTP status was not successful')
