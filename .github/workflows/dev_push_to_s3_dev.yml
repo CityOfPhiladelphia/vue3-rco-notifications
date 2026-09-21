@@ -5,7 +5,7 @@ name: dev Push to S3 dev bucket
 on:
   push:
     branches:
-      - fix/large-polygon-queries
+      - feat/mailing-labels-export
 jobs:
   build:
 
