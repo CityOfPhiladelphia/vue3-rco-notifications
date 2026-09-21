@@ -27,7 +27,7 @@ export default function (properties) {
 
   const labels = properties
     .filter(item => item.address_std)
-    .map(item => [ item.address_std, `PHILADELPHIA, PA ${item.zip_code}` ]);
+    .map(item => [ 'ATTN: ALL RESIDENTS', item.address_std, `PHILADELPHIA, PA ${item.zip_code}` ]);
 
   labels.forEach((label, index) => {
     const position = index % LABELS_PER_PAGE;
