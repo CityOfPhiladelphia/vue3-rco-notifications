@@ -9,6 +9,7 @@ import { useRcoParcelsStore } from '@/stores/RcoParcelsStore.js'
 const RcoParcelsStore = useRcoParcelsStore();
 
 import CustomPaginationLabels from '@/components/pagination/CustomPaginationLabels.vue';
+import exportMailingLabels from '@/util/mailing-labels.js';
 
 import FullScreenTopicsToggleTab from '@/components/FullScreenTopicsToggleTab.vue';
 import AddressSearchControl from '@/components/AddressSearchControl.vue';
@@ -203,6 +204,10 @@ const exportProperties = () => {
   link.click();
 };
 
+const exportPropertiesMailingLabels = () => {
+  exportMailingLabels(opaProperties.value);
+};
+
 const councilDistrict = computed(() => {
   if (GeocodeStore.aisData && GeocodeStore.aisData.features) {
     return GeocodeStore.aisData.features[0].properties.council_district_2024;
@@ -377,9 +382,15 @@ watch(
         <template #table-actions>
           <button
             class="button is-small is-primary export-button"
+            @click="exportPropertiesMailingLabels()"
+          >
+            Mailing Labels
+          </button>
+          <button
+            class="button is-small is-primary export-button"
             @click="exportProperties()"
           >
-            Export Properties
+            Download CSV
           </button>
         </template>
 
