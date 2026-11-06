@@ -136,7 +136,7 @@ const dataFetch = async(to, from) => {
     }
     if (import.meta.env.VITE_DEBUG) console.log('in datafetch, after geocode, GeocodeStore.aisData:', GeocodeStore.aisData);
 
-    await GeocodeStore.fillAisBlockData(address);
+    await GeocodeStore.fillAisBlockData();
 
     // if this was NOT started by a map click, get the parcels
     if (MainStore.lastSearchMethod !== 'mapClick') {
