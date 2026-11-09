@@ -3,6 +3,7 @@ import { useGeocodeStore } from '@/stores/GeocodeStore.js'
 import { useMainStore } from '@/stores/MainStore.js'
 import { useMapStore } from '@/stores/MapStore.js'
 import { useParcelsStore } from '@/stores/ParcelsStore.js'
+import { fetchTableRowsByIds } from '@/util/databridge.js';
 import axios from 'axios';
 
 import useTransforms from '@/composables/useTransforms';
@@ -76,12 +77,17 @@ export const useRcoParcelsStore = defineStore('RcoParcelsStore', {
     async fillOpaPropertiesPublic() {
       try {
         // if (import.meta.env.VITE_DEBUG) console.log('fillOpaPropertiesPublic is running');
-        const opaSet = this.pwdParcelsMerged.features.map((feature) => feature.properties.parcel_id).join("','");
-        if (import.meta.env.VITE_DEBUG) console.log('opaSet:', opaSet);
-        const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+pwd_parcel_id+in+(%27${opaSet}%27)`);
-        // const response = await fetch(`https://phl.carto.com/api/v2/sql?q=select+*+from+opa_properties_public_pde+where+parcel_number+in+(%27${opaSet}%27)`);
-        if (response.ok) {
-          let data = await response.json();
+        const parcelIds = this.pwdParcelsMerged.features.map((feature) => feature.properties.parcel_id);
+        if (import.meta.env.VITE_DEBUG) console.log('parcelIds:', parcelIds);
+        const rows = await fetchTableRowsByIds({
+          table: 'opa_properties_public_pde',
+          column: 'pwd_parcel_id',
+          ids: parcelIds,
+          // the address, the mailing address, and the keys the panel and the CSV export read
+          fields: 'parcel_number, pwd_parcel_id, address_std, zip_code, mailing_care_of, mailing_address_1, mailing_address_2, mailing_street, mailing_city_state, mailing_zip, objectid',
+        });
+        if (rows) {
+          let data = { rows };
           // if (import.meta.env.VITE_DEBUG) console.log('data:', data);
           data.rows.forEach(item => {
             // if (import.meta.env.VITE_DEBUG) console.log('item:', item);
