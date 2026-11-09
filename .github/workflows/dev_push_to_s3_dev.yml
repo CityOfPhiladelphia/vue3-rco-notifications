@@ -5,7 +5,7 @@ name: dev Push to S3 dev bucket
 on:
   push:
     branches:
-      - feat/mailing-labels-export
+      - wip/gateway-migration
 jobs:
   build:
 
@@ -42,6 +42,7 @@ jobs:
         VITE_CYCLOMEDIA_USERNAME: ${{ secrets.VITE_CYCLOMEDIA_USERNAME }}
         VITE_EAGLEVIEW_CLIENT_ID: ${{ secrets.VITE_EAGLEVIEW_CLIENT_ID }}
         VITE_EAGLEVIEW_CLIENT_SECRET: ${{ secrets.VITE_EAGLEVIEW_CLIENT_SECRET }}
+        VITE_GATEWAY_CLIENT_ID: ${{ secrets.VITE_GATEWAY_CLIENT_ID }}
 
     - name: Deploy to Dev s3, Set index headers, and Invalidate Cloudfront
       env:
