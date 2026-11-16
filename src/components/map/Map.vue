@@ -12,9 +12,6 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 // so the worker is built as its own file and its URL is handed to maplibre
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 maplibregl.setWorkerUrl(maplibreWorkerUrl);
-// this was recommended by a comment in https://github.com/mapbox/mapbox-gl-js/issues/9114
-// the official mapbox-gl-draw was blocking map clicks
-import '@/assets/mapbox-gl-draw.min.js'
 import '@/assets/maplibre-gl-draw.css';
 import destination from '@turf/destination';
 import { point, polygon, multiPolygon } from '@turf/helpers';
@@ -168,7 +165,7 @@ onMounted(async () => {
     }
   });
 
-  // mapbox-gl-draw is initialized
+  // mapbox-gl-draw is initialized; MapboxDraw is the browser global set by public/mapbox-gl-draw.min.js, loaded in index.html
   const draw = new MapboxDraw({
     displayControlsDefault: false,
     controls: {
