@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import { useGeocodeStore } from '@/stores/GeocodeStore.js'
-import axios from 'axios';
+import { fetchTableGeoJSON } from '@/util/databridge.js';
+
+const PWD_TABLE = 'pwd_parcels_3857';
+const PWD_FIELDS = 'parcelid, address, objectid';
 
 export const useParcelsStore = defineStore('ParcelsStore', {
   state: () => {
@@ -26,43 +29,21 @@ export const useParcelsStore = defineStore('ParcelsStore', {
         this.pwd = this.pwdChecked;
         return;
       }
-      try {
-        const response = await fetch(`https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query?where=parcelid=%27${pwdParcelNumber}%27&outSR=4326&f=geojson&outFields=*&returnGeometry=true`);
-        if (response.ok) {
-          this.pwd = await response.json()
-        } else {
-          if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelData - await resolved but HTTP status was not successful');
-        }
-      } catch {
-        if (import.meta.env.VITE_DEBUG) console.error('fillPwdParcelData - await never resolved, failed to fetch parcel data');
+      const data = await fetchTableGeoJSON({ table: PWD_TABLE, fields: PWD_FIELDS, where: `parcelid = '${pwdParcelNumber}'` });
+      if (data) {
+        this.pwd = data;
+      } else {
+        if (import.meta.env.VITE_DEBUG) console.warn('fillPwdParcelData - failed to fetch parcel data');
       }
     },
 
     async checkParcelDataByLngLat(lng, lat) {
       if (import.meta.env.VITE_DEBUG) console.log('checkParcelDataByLngLat, lng:', lng, 'lat:', lat);
-      let params = {
-        'where': '1=1',
-        'outSR': 4326,
-        'f': 'geojson',
-        'outFields': '*',
-        'returnGeometry': true,
-        'geometry': `{ "x": ${lng}, "y": ${lat}, "spatialReference":{ "wkid":4326 }}`,
-        'geometryType': 'esriGeometryPoint',
-        'spatialRel': 'esriSpatialRelWithin',
-      };
-      try {
-        const response = await axios('https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/PWD_PARCELS/FeatureServer/0/query', { params });
-        if (response.status !== 200) {
-          if (import.meta.env.VITE_DEBUG) console.warn('checkParcelDataByLngLat - await resolved but HTTP status was not successful')
-        }
-        if (response.data.features.length > 0) {
-          this.pwdChecked = response.data;
-        } else {
-          if (import.meta.env.VITE_DEBUG) console.log('checkParcelDataByLngLat - no pwd parcel at this point');
-          this.pwdChecked = {};
-        }
-      } catch {
-        if (import.meta.env.VITE_DEBUG) console.error('checkParcelDataByLngLat await never resolved, failed to fetch pwd parcel data by lng/lat')
+      const data = await fetchTableGeoJSON({ table: PWD_TABLE, fields: PWD_FIELDS, point: { lng, lat } });
+      if (data && data.features.length > 0) {
+        this.pwdChecked = data;
+      } else {
+        if (import.meta.env.VITE_DEBUG) console.log('checkParcelDataByLngLat - no pwd parcel at this point');
         this.pwdChecked = {};
       }
     },
