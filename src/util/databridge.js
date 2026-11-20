@@ -79,6 +79,54 @@ export async function fetchTableAllRows({ table, where, fields, pageSize = 999 }
   }
 }
 
+// fetches a table-style query as a GeoJSON FeatureCollection - the table response carries
+// geometry natively in 4326. where takes a plain SQL where; point ({ lng, lat }, 4326)
+// selects the polygons containing that point through the API's own x/y lookup. Both run
+// on PostgREST (an ST_Contains where would route to Carto and count against its quota).
+// Returns null on any failure; feature.id stamped from objectid, single-poly
+// MultiPolygons unwrapped. Ported from vue3-atlas src/util/databridge.js
+export async function fetchTableGeoJSON({ table, fields, where, point }) {
+  const params = new URLSearchParams({ table });
+  if (fields) {
+    params.set('fields', fields.replace(/\s/g, ''));
+  }
+  if (where) {
+    params.set('where', where);
+  }
+  if (point) {
+    params.set('x', point.lng);
+    params.set('y', point.lat);
+  }
+  if (GATEWAY_CLIENT_ID) {
+    params.set('client_id', GATEWAY_CLIENT_ID);
+  }
+  let data;
+  try {
+    const response = await fetch(`${DATABRIDGE_URL}?${params}`);
+    if (!response.ok) {
+      return null;
+    }
+    data = await response.json();
+  } catch {
+    return null;
+  }
+  const features = data && data.data && data.data.features;
+  if (!features) {
+    return null;
+  }
+  return {
+    type: 'FeatureCollection',
+    features: features.map((f) => {
+      const properties = normalizeTimestamps(f.properties);
+      let geometry = f.geometry;
+      if (geometry && geometry.type === 'MultiPolygon' && geometry.coordinates.length === 1) {
+        geometry = { type: 'Polygon', coordinates: geometry.coordinates[0] };
+      }
+      return { type: 'Feature', id: properties.objectid, properties, geometry };
+    }),
+  };
+}
+
 // fetches every row whose column is in ids, in parallel batches short enough for the
 // gateway's URL limit. Returns the combined rows, or null if any batch failed
 export async function fetchTableRowsByIds({ table, column, ids, fields }) {
